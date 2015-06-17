@@ -12,14 +12,27 @@ import com.bsu.bk42.screen.StarScreen;
 public class BakerStreet42 extends Game {
 //	SpriteBatch batch;
 //	Texture img;
+	private int screenIndex = 1;
+	public BakerStreet42(int si){
+		screenIndex = si;
+	}
 
 	@Override
 	public void create () {
 //		batch = new SpriteBatch();
 //		img = new Texture("badlogic.jpg");
-		MapScreen ms = new MapScreen();
-		StarScreen ss = new StarScreen();
-		this.setScreen(ss);
+		switch(screenIndex){
+			case 0:
+				MapScreen ms = new MapScreen();
+				this.setScreen(ms);
+				break;
+			case 1:
+				StarScreen ss = new StarScreen();
+				this.setScreen(ss);
+				break;
+		}
+
+
 	}
 
 //	@Override

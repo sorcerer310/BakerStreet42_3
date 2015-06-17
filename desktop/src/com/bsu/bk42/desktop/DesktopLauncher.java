@@ -7,9 +7,9 @@ import com.bsu.bk42.BakerStreet42;
 public class DesktopLauncher {
 	public static void main (String[] arg) {
 		LwjglApplicationConfiguration config = new LwjglApplicationConfiguration();
-		config.title = "贝克街42号";
+		config.title = "BakerStreet42";
 		config.width = 480;
 		config.height = 800;
-		new LwjglApplication(new BakerStreet42(), config);
+		new LwjglApplication(new BakerStreet42(0), config);
 	}
 }
