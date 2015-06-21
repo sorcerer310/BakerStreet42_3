@@ -1,13 +1,13 @@
 package com.bsu.bk42.screen;
 
-import aurelienribon.tweenengine.Tween;
-import aurelienribon.tweenengine.TweenManager;
+import aurelienribon.tweenengine.*;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.*;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.scenes.scene2d.*;
 import com.badlogic.gdx.scenes.scene2d.ui.Image;
+import com.badlogic.gdx.scenes.scene2d.ui.Table;
 import com.badlogic.gdx.scenes.scene2d.utils.DragListener;
 import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.viewport.StretchViewport;
@@ -21,39 +21,68 @@ import com.ugame.gdx.tween.accessor.ActorAccessor;
 public class StarScreen extends UGameScreen {
     public static float screenWidth,screenHeight,scaleWidth,scaleHeight;
 
-    private Texture tx_star = null;                                                                                 //星星图案的纹理
-    private Array<StarImage> stars = new Array<StarImage>();
+    private Texture tx_star = null;                                                                                  //星星图案的纹理
+    private Array<StarImage> currStars = new Array<StarImage>();
+    private Array<Array<StarImage>> all3ScreenStars = new Array<Array<StarImage>>();                                //3屏幕的所有星星
+    private int currScreen = 0;                                                                                     //当前屏幕的索引
+    private int disappearCount = 0;                                                                                 //当前屏幕星星消失的数量
+    private Texture tx_starbackground = null;                                                                      //星星背景
+    private StarBackgroundImage sbi;                                                                                  //星星背景对象
 
-    private enum DRAWSTATE {NOMAL,DRAW};                                                                            //连线的绘制状态
+    private enum DRAWSTATE {NOMAL,DRAW};                                                                             //连线的绘制状态
     private DRAWSTATE state = DRAWSTATE.NOMAL;                                                                       //当前连线状态
     private Vector2 movePoint = new Vector2();
 
-    private Array<Vector2> linePoints = new Array<Vector2>();                                                       //要绘制的所有拐点
-    private int lineWidth = 5;
-    public StarScreen(){
-        screenWidth = 480.0f;
-        screenHeight = 800.0f;
-        stage = new Stage(new StretchViewport(screenWidth, screenHeight));
-//        stage.addCaptureListener(new DragListener(){});
+    private Array<Vector2> linePoints = new Array<Vector2>();                                                             //要绘制的所有拐点
+    private int lineWidth = 5;                                                                                       //绘制的线段宽度
 
-        scaleWidth = Gdx.graphics.getWidth()/screenWidth;
+    private Table layout = new Table();                                                                              //布局对象根table
+    public StarScreen(){
+        screenWidth = 720.0f;                                                                                           //设置游戏界面的宽高
+        screenHeight = 1280.0f;
+        stage = new Stage(new StretchViewport(screenWidth, screenHeight));
+        scaleWidth = Gdx.graphics.getWidth()/screenWidth;                                                               //获得游戏界面与设备间的比例
         scaleHeight = Gdx.graphics.getHeight()/screenHeight;
 
+        //初始化背景
+        tx_starbackground = new Texture(Gdx.files.internal("starbackground.png"));
+        sbi = new StarBackgroundImage(tx_starbackground){
+            {
+                //背景移动完后把当前屏幕的星星切换为下一屏幕的星星.
+                this.setMoveListener(new MoveListener() {
+                    @Override
+                    public void completed(StarBackgroundImage sbi) {
+                        for(StarImage sii:currStars) {                                                                //增加新屏幕的星星
+                            sii.setColor(sii.getColor().r,sii.getColor().g,sii.getColor().b,.0f);                       //设置星星的透明度为0
+                            sii.appear();
+                            stage.addActor(sii);
+                        }
+                    }
+                });
+            }
+        };                                                           //设置背景图对象
+        stage.addActor(sbi);
+        //初始化所有的星星
         tx_star = new Texture(Gdx.files.internal("star.png"));
-        stars = initStars(tx_star);
-        stage.addListener(new DragListener(){
+        all3ScreenStars = init3ScreenStars(tx_star);
+        currStars = all3ScreenStars.get(currScreen);
+        for(StarImage si:currStars)
+            stage.addActor(si);
 
+
+        stage.addListener(new DragListener(){
             @Override
             public boolean touchDown(InputEvent event, float x, float y, int pointer, int button) {
                 //当鼠标点在某个星星范围内设置为绘制的第一个点.
-                for(int i=0;i<stars.size;i++){
-                    if(stars.get(i).hit(x-stars.get(i).getX(),y-stars.get(i).getY(),true)!=null) {
+                for(int i=0;i< currStars.size;i++){
+                    if(currStars.get(i).hit(x- currStars.get(i).getX(),y- currStars.get(i).getY(),true)!=null) {
                         linePoints.clear();
-                        StarImage si = stars.get(i);
+                        StarImage si = currStars.get(i);
                         si.setIsSelected(true);                                                                         //设置当前星星为选中
                         linePoints.add(new Vector2(si.getX()+si.getWidth()/2,si.getY()+si.getHeight()/2));
                     }
                 }
+//                sbi.goRight();
                 return true;
             }
 
@@ -62,8 +91,75 @@ public class StarScreen extends UGameScreen {
                 super.touchUp(event, x, y, pointer, button);
                 //当抬起鼠标时恢复绘状态
                 state = DRAWSTATE.NOMAL;
-                for(int i=0;i<stars.size;i++)
-                    stars.get(i).setIsSelected(false);
+                for(int i=0;i< currStars.size;i++)
+                    currStars.get(i).setIsSelected(false);                                                            //设置所有的星星为未选中
+
+                //判断当前所有连接拐点与顺序一致,如果一致则正确切换到下一屏
+                boolean right = true;
+                if(linePoints.size== currStars.size){
+                    for(int i=0;i<currStars.size;i++)
+                        if(currStars.get(i).hit(linePoints.get(i).x-currStars.get(i).getX()
+                                ,linePoints.get(i).y-currStars.get(i).getY(),true)==null) {
+                            right = false;
+                            break;
+                        }
+                }else{
+                    right = false;
+                }
+                //如果所有的点都正确,切到下一屏,并设置当前的星星为下一屏幕的星星
+                if(right) {
+                    if(currScreen<2) {
+                        //当屏幕为前两个屏幕时移动到下个屏幕
+                        for (StarImage si : currStars) {                                                                       //先移除当前屏幕的星星
+                            si.setOpacityListener(new StarImage.OpacityListener() {
+                                @Override
+                                public void disappearCompleted(StarImage si) {
+                                    System.out.println("==================right:" + disappearCount);
+                                    if (++disappearCount == currStars.size) {
+                                        sbi.goRight();                                                                                      //背景向右移动
+                                        currStars = all3ScreenStars.get(++currScreen);                                                 //切到下一屏的星星
+//                                    for(StarImage sii:currStars)                                                                       //增加新屏幕的星星
+//                                        stage.addActor(sii);
+                                        stage.getActors().removeValue(si, true);                                           //动画完成移除所有星星
+                                    }
+                                }
+
+                                @Override
+                                public void appearCompleted(StarImage si) {
+
+                                }
+                            });
+                            si.disappear();
+
+                        }
+                    }else{
+                        //当前屏幕为最后一个屏幕时整个星图成功
+                        //当屏幕为前两个屏幕时移动到下个屏幕
+                        for (StarImage si : currStars) {                                                                       //先移除当前屏幕的星星
+                            si.setOpacityListener(new StarImage.OpacityListener() {
+                                @Override
+                                public void disappearCompleted(StarImage si) {
+                                    System.out.println("==================right:" + disappearCount);
+                                    if (++disappearCount == currStars.size) {
+//                                        sbi.goRight();                                                                                      //背景向右移动
+                                        sbi.goScale();
+//                                        currStars = all3ScreenStars.get(++currScreen);                                                 //切到下一屏的星星
+                                        stage.getActors().removeValue(si, true);                                           //动画完成移除所有星星
+                                    }
+                                }
+
+                                @Override
+                                public void appearCompleted(StarImage si) {
+
+                                }
+                            });
+                            si.disappear();
+
+                        }
+                    }
+
+                }
+                linePoints.clear();                                                                                   //设置要绘制的拐点为空
             }
 
             @Override
@@ -73,17 +169,19 @@ public class StarScreen extends UGameScreen {
                     state = DRAWSTATE.DRAW;                                                                           //切换到绘制状态
                 movePoint.set(event.getStageX(), event.getStageY());                                                  //设置移动时的坐标
                 //判断当前是否经过了其他星,如果经过了其他的则获得下个绘制拐点
-                for(int i=0;i<stars.size;i++) {
-                    StarImage si = stars.get(i);
-                    if (!si.isSelected() && si.hit(x-stars.get(i).getX(),y-stars.get(i).getY(),true)!=null) {
+                for(int i=0;i< currStars.size;i++) {
+                    StarImage si = currStars.get(i);
+                    if (!si.isSelected() && si.hit(x- currStars.get(i).getX(),y- currStars.get(i).getY(),true)!=null) {
                         linePoints.add(new Vector2(si.getX() + si.getWidth() / 2, si.getY() + si.getHeight() / 2));
                         si.setIsSelected(true);
-                        System.out.println("setIsSelected "+linePoints.size);
                     }
                 }
             }
         });
+
     }
+
+    //渲染连线
     private ShapeRenderer srender = new ShapeRenderer();
     @Override
     public void render(float delta) {
@@ -91,8 +189,6 @@ public class StarScreen extends UGameScreen {
         if(state==DRAWSTATE.DRAW) {
             srender.begin(ShapeRenderer.ShapeType.Filled);
             for(int i=0;i<linePoints.size;i++) {
-//                if(linePoints.size==2)
-//                    System.out.println("render linePoint size"+linePoints.size);
                 //绘制末端可移动的线
                 if(i==linePoints.size-1) {
                     int index = linePoints.size==1?0:i;
@@ -103,7 +199,6 @@ public class StarScreen extends UGameScreen {
                 if(i!=0){
                     srender.rectLine(linePoints.get(i - 1).x * StarScreen.scaleWidth, linePoints.get(i - 1).y * StarScreen.scaleHeight,
                             linePoints.get(i).x * StarScreen.scaleWidth, linePoints.get(i).y * StarScreen.scaleHeight, lineWidth);
-
                 }
             }
             srender.end();
@@ -111,28 +206,35 @@ public class StarScreen extends UGameScreen {
     }
 
     /**
-     * 在该函数中初始化所有星星
-     * @param t     带入初始化星星图形的纹理对象
-     * @return      返回星星对象的数组
+     * 初始化一屏的星图
+     * @param t         星星的纹理
+     * @param count    要初始化的星星的数量
+     * @param p         所有星星的坐标,2维数组 第1维数据是x y坐标,第2维数据表示哪颗5星星
+     * @return          返回一屏设置好的星星
      */
-    private Array<StarImage> initStars(Texture t){
+    private Array<StarImage> init1ScreenStars(Texture t,int count,int[][] p){
         Array<StarImage> s = new Array<StarImage>();
-        for(int i=0;i<7;i++) {
+        for(int i=0;i<count;i++) {
             StarImage si = new StarImage(t);
-            stage.addActor(si);
+            si.setPosition(p[i][0],p[i][1]);
             s.add(si);
         }
-        s.get(0).setPosition(256,726);
-        s.get(1).setPosition(160,626);
-        s.get(2).setPosition(150,460);
-        s.get(3).setPosition(200,330);
-        s.get(4).setPosition(330,290);
-        s.get(5).setPosition(346,149);
-        s.get(6).setPosition(189,112);
         return s;
     }
 
-
+    /**
+     * 3屏所有的星星,在不同的屏幕对应显示不同的星星组
+     * @param t 要实现星星的纹理图片
+     * @return  返回3屏幕星星数组
+     */
+    private Array<Array<StarImage>> init3ScreenStars(Texture t){
+        Array<Array<StarImage>> sstars = new Array<Array<StarImage>>();
+        sstars.add(init1ScreenStars(t,4,new int[][]{{256,856},{160,756},{150,590},{200,400}}));
+        sstars.add(init1ScreenStars(t,5,new int[][]{{256,856},{160,756},{150,590},{200,400},{330,420}}));
+        sstars.add(init1ScreenStars(t,12,new int[][]{{256,856},{160,756},{150,590},{200,400},{330,420},{346,279},
+                {206,856},{110,756},{100,590},{150,400},{280,420},{296,279}}));
+        return sstars;
+    }
 
     @Override
     public void show() {
@@ -144,30 +246,157 @@ public class StarScreen extends UGameScreen {
 /**
  * 星星对象
  */
-class StarImage extends Image{
-    private TweenManager tm = new TweenManager();
-    private Vector2 movePoint = new Vector2();
+class StarImage extends Image {
+    private TweenManager tm = new TweenManager();                                                                     //动画管理器
+    private Vector2 movePoint = new Vector2();                                                                       //移动的点
 
-    private boolean isSelected = false;
+    private boolean isSelected = false;                                                                            //标识是否被选择
+
+    private OpacityListener listener = null;                                                                      //监听消失操作是否完成
 
     public StarImage(Texture t){
         super(t);
         Tween.registerAccessor(Image.class, new ActorAccessor());
         Tween.to(this, ActorAccessor.ROTATION_CPOS_XY, 1.0f).target(360.0f)
+                .ease(TweenEquations.easeNone)
                 .repeat(-1, 0.0f).start(tm);
     }
+
+    /**
+     * 消失动作
+     */
+    public void disappear(){
+        Tween.to(this,ActorAccessor.OPACITY,1.0f).target(.0f)
+                .ease(TweenEquations.easeNone).setCallback(new TweenCallback() {
+            @Override
+            public void onEvent(int i, BaseTween<?> baseTween) {
+                System.out.println("disappear");
+                if (i == TweenCallback.COMPLETE && listener != null) {
+                    listener.disappearCompleted(StarImage.this);
+                }
+            }
+        }).start(tm);
+    }
+
+    public void appear(){
+        Tween.to(this,ActorAccessor.OPACITY,1.0f).target(1.0f)
+                .ease(TweenEquations.easeNone).setCallback(new TweenCallback() {
+            @Override
+            public void onEvent(int i, BaseTween<?> baseTween) {
+                if (i == TweenCallback.COMPLETE && listener != null)
+                    listener.appearCompleted(StarImage.this);
+            }
+        }).start(tm);
+    }
+
+    @Override
+    public void act(float delta) {
+        super.act(delta);
+
+        tm.update(delta);
+    }
+    public boolean isSelected() {
+        return isSelected;
+    }
+    public void setIsSelected(boolean isSelected) {
+        this.isSelected = isSelected;
+    }
+
+    public void setOpacityListener(OpacityListener listener) {
+            this.listener = listener;
+    }
+
+    /**
+     * 消失完成监听
+     */
+    static interface OpacityListener {
+        public void disappearCompleted(StarImage si);
+        public void appearCompleted(StarImage si);
+    }
+}
+
+/**
+ *  星盘的背景图
+ */
+class StarBackgroundImage extends Image{
+    TweenManager tm = new TweenManager();
+
+    private MoveListener listener = null;
+
+    public StarBackgroundImage(Texture t){
+        super(t);
+        this.setPosition(-this.getWidth()/3*2,(StarScreen.screenHeight-this.getHeight())/2);
+        Tween.registerAccessor(Image.class, new ActorAccessor());
+    }
+
+    /**
+     * 向左移动一屏
+     */
+    public void goLeft(){
+        //如果移动位置超过了自身的2/3就不能向左移动了
+        if(this.getX()>-this.getWidth()/3*2)
+            Tween.to(this,ActorAccessor.POS_XY,1.0f).target(this.getX() - this.getWidth() / 3, this.getY())
+                    .setCallback(new TweenCallback() {
+                        @Override
+                        public void onEvent(int i, BaseTween<?> baseTween) {
+                            if (i == TweenCallback.COMPLETE && listener != null)
+                                listener.completed(StarBackgroundImage.this);
+                        }
+                    }).start(tm);
+    }
+
+
+    /**
+     * 向右移动一屏
+     */
+    public void goRight(){
+        //如果移动位置超过了0,就不能向右移动了
+        if(this.getX()<0) {
+            Tween.to(this, ActorAccessor.POS_XY, 1.0f)
+                    .target(this.getX() + this.getWidth() / 3, this.getY())
+                    .setCallback(new TweenCallback() {
+                        @Override
+                        public void onEvent(int i, BaseTween<?> baseTween) {
+                            if(i==TweenCallback.COMPLETE && listener!=null)
+                                listener.completed(StarBackgroundImage.this);
+                        }
+                    }).start(tm);
+        }
+    }
+
+    /**
+     * 将画面缩小,显示全图
+     */
+    public void goScale(){
+//        this.setOrigin(this.getWidth()/2,this.getHeight()/2);
+        Timeline.createParallel()
+                .beginParallel()
+                .push(
+                    Tween.to(this, ActorAccessor.SCALE_XY, 1.0f)
+                        .target(.3333f, .3333f)
+                )
+                .push(
+                        Tween.to(this, ActorAccessor.POS_XY,1.0f)
+                            .target(this.getX(),this.getY()+this.getHeight()*0.3333f)
+                )
+                .end()
+                .start(tm);
+    }
+
     @Override
     public void act(float delta) {
         super.act(delta);
         tm.update(delta);
     }
 
-    public boolean isSelected() {
-        return isSelected;
+    public void setMoveListener(MoveListener listener) {
+        this.listener = listener;
     }
 
-    public void setIsSelected(boolean isSelected) {
-        this.isSelected = isSelected;
+    /**
+     * 移动监听器
+     */
+    static interface MoveListener {
+        public void completed(StarBackgroundImage sbi);
     }
 }
-
