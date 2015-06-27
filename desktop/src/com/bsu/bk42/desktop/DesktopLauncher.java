@@ -10,6 +10,6 @@ public class DesktopLauncher {
 		config.title = "BakerStreet42";
 		config.width = 480;
 		config.height = 800;
-		new LwjglApplication(new BakerStreet42(0), config);
+		new LwjglApplication(new BakerStreet42(), config);
 	}
 }
