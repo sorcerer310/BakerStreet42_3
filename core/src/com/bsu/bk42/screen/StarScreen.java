@@ -2,6 +2,8 @@ package com.bsu.bk42.screen;
 
 import aurelienribon.tweenengine.*;
 import com.badlogic.gdx.Gdx;
+import com.badlogic.gdx.Net;
+import com.badlogic.gdx.files.FileHandle;
 import com.badlogic.gdx.graphics.*;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 import com.badlogic.gdx.math.Vector2;
@@ -10,9 +12,15 @@ import com.badlogic.gdx.scenes.scene2d.ui.Image;
 import com.badlogic.gdx.scenes.scene2d.ui.Table;
 import com.badlogic.gdx.scenes.scene2d.utils.DragListener;
 import com.badlogic.gdx.utils.Array;
+import com.badlogic.gdx.utils.ObjectMap;
+import com.badlogic.gdx.utils.PropertiesUtils;
 import com.badlogic.gdx.utils.viewport.StretchViewport;
 import com.ugame.gdx.tools.UGameScreen;
 import com.ugame.gdx.tween.accessor.ActorAccessor;
+import com.ugame.net.UGameNetInstance;
+
+import java.io.File;
+import java.util.Iterator;
 
 /**
  * 星星解锁
@@ -36,13 +44,24 @@ public class StarScreen extends UGameScreen {
     private Array<Vector2> linePoints = new Array<Vector2>();                                                             //要绘制的所有拐点
     private int lineWidth = 5;                                                                                       //绘制的线段宽度
 
-    private Table layout = new Table();                                                                              //布局对象根table
+    UGameNetInstance uni = null;
     public StarScreen(){
         screenWidth = 720.0f;                                                                                           //设置游戏界面的宽高
         screenHeight = 1280.0f;
         stage = new Stage(new StretchViewport(screenWidth, screenHeight));
         scaleWidth = Gdx.graphics.getWidth()/screenWidth;                                                               //获得游戏界面与设备间的比例
         scaleHeight = Gdx.graphics.getHeight()/screenHeight;
+
+        //初始化网络组件
+        try {
+            //获得net.properties数据的
+            ObjectMap<String,String> properties = new ObjectMap<String,String>();
+            PropertiesUtils.load(properties, Gdx.files.internal("assets/net.properties").reader());
+            UGameNetInstance.initParam(properties.get("urlpath"), "0");
+            uni = UGameNetInstance.getInstance();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
 
         //初始化背景
         tx_starbackground = new Texture(Gdx.files.internal("starbackground.png"));
@@ -154,10 +173,8 @@ public class StarScreen extends UGameScreen {
                                 }
                             });
                             si.disappear();
-
                         }
                     }
-
                 }
                 linePoints.clear();                                                                                   //设置要绘制的拐点为空
             }
@@ -205,6 +222,7 @@ public class StarScreen extends UGameScreen {
         }
     }
 
+    private int sumStarCount = 0;                                                                                   //统计当前生成了星星的数量,用来给星星做id标识
     /**
      * 初始化一屏的星图
      * @param t         星星的纹理
@@ -216,6 +234,7 @@ public class StarScreen extends UGameScreen {
         Array<StarImage> s = new Array<StarImage>();
         for(int i=0;i<count;i++) {
             StarImage si = new StarImage(t);
+            si.setId("S"+sumStarCount++);
             si.setPosition(p[i][0],p[i][1]);
             s.add(si);
         }
@@ -249,13 +268,21 @@ public class StarScreen extends UGameScreen {
 class StarImage extends Image {
     private TweenManager tm = new TweenManager();                                                                     //动画管理器
     private Vector2 movePoint = new Vector2();                                                                       //移动的点
-
+    private String id ="";                                                                                            //当前星星的标识
     private boolean isSelected = false;                                                                            //标识是否被选择
-
     private OpacityListener listener = null;                                                                      //监听消失操作是否完成
+
+    UGameNetInstance uni = null;
 
     public StarImage(Texture t){
         super(t);
+
+        try {
+            uni = UGameNetInstance.getInstance();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
         Tween.registerAccessor(Image.class, new ActorAccessor());
         Tween.to(this, ActorAccessor.ROTATION_CPOS_XY, 1.0f).target(360.0f)
                 .ease(TweenEquations.easeNone)
@@ -300,7 +327,28 @@ class StarImage extends Image {
     }
     public void setIsSelected(boolean isSelected) {
         this.isSelected = isSelected;
+        //当星星选中为true时发送url数据到服务器
+        if(isSelected) {
+            uni.getMethodRequestWithoutDomain("/plc_send_serial?plccmd="+this.getId(), new Net.HttpResponseListener() {
+                @Override
+                public void handleHttpResponse(Net.HttpResponse httpResponse) {}
+                @Override
+                public void failed(Throwable t) {}
+                @Override
+                public void cancelled() {}
+            });
+            System.out.println("+++++++++++++++++" + id);
+        }
     }
+
+    public String getId() {
+        return id;
+    }
+
+    public void setId(String id) {
+        this.id = id;
+    }
+
 
     public void setOpacityListener(OpacityListener listener) {
             this.listener = listener;
