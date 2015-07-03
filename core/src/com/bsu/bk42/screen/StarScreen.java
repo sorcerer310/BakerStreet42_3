@@ -15,6 +15,7 @@ import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.ObjectMap;
 import com.badlogic.gdx.utils.PropertiesUtils;
 import com.badlogic.gdx.utils.viewport.StretchViewport;
+import com.bsu.bk42.PlcCommHelper;
 import com.ugame.gdx.tools.UGameScreen;
 import com.ugame.gdx.tween.accessor.ActorAccessor;
 import com.ugame.net.UGameNetInstance;
@@ -44,24 +45,12 @@ public class StarScreen extends UGameScreen {
     private Array<Vector2> linePoints = new Array<Vector2>();                                                             //要绘制的所有拐点
     private int lineWidth = 5;                                                                                       //绘制的线段宽度
 
-    UGameNetInstance uni = null;
     public StarScreen(){
         screenWidth = 720.0f;                                                                                           //设置游戏界面的宽高
         screenHeight = 1280.0f;
         stage = new Stage(new StretchViewport(screenWidth, screenHeight));
         scaleWidth = Gdx.graphics.getWidth()/screenWidth;                                                               //获得游戏界面与设备间的比例
         scaleHeight = Gdx.graphics.getHeight()/screenHeight;
-
-        //初始化网络组件
-        try {
-            //获得net.properties数据的
-            ObjectMap<String,String> properties = new ObjectMap<String,String>();
-            PropertiesUtils.load(properties, Gdx.files.internal("assets/net.properties").reader());
-            UGameNetInstance.initParam(properties.get("urlpath"), "0");
-            uni = UGameNetInstance.getInstance();
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
 
         //初始化背景
         tx_starbackground = new Texture(Gdx.files.internal("starbackground.png"));
@@ -133,7 +122,6 @@ public class StarScreen extends UGameScreen {
                             si.setOpacityListener(new StarImage.OpacityListener() {
                                 @Override
                                 public void disappearCompleted(StarImage si) {
-                                    System.out.println("==================right:" + disappearCount);
                                     if (++disappearCount == currStars.size) {
                                         sbi.goRight();                                                                                      //背景向右移动
                                         currStars = all3ScreenStars.get(++currScreen);                                                 //切到下一屏的星星
@@ -158,7 +146,6 @@ public class StarScreen extends UGameScreen {
                             si.setOpacityListener(new StarImage.OpacityListener() {
                                 @Override
                                 public void disappearCompleted(StarImage si) {
-                                    System.out.println("==================right:" + disappearCount);
                                     if (++disappearCount == currStars.size) {
 //                                        sbi.goRight();                                                                                      //背景向右移动
                                         sbi.goScale();
@@ -175,6 +162,15 @@ public class StarScreen extends UGameScreen {
                             si.disappear();
                         }
                     }
+                }else{
+                    System.out.println("not right");
+                    //如果不正确,熄灭所有的灯
+                    Array<String> paths = new Array<String>();
+                    for(StarImage si:currStars)
+                        paths.add("/plc_send_serial?plccmd=N"+si.getId());
+//                    paths.add("/plc_send_serial?plccmd=NS0");
+
+                    PlcCommHelper.getInstance().simpleGetMoreCmd(paths);
                 }
                 linePoints.clear();                                                                                   //设置要绘制的拐点为空
             }
@@ -272,17 +268,9 @@ class StarImage extends Image {
     private boolean isSelected = false;                                                                            //标识是否被选择
     private OpacityListener listener = null;                                                                      //监听消失操作是否完成
 
-    UGameNetInstance uni = null;
 
     public StarImage(Texture t){
         super(t);
-
-        try {
-            uni = UGameNetInstance.getInstance();
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-
         Tween.registerAccessor(Image.class, new ActorAccessor());
         Tween.to(this, ActorAccessor.ROTATION_CPOS_XY, 1.0f).target(360.0f)
                 .ease(TweenEquations.easeNone)
@@ -297,7 +285,6 @@ class StarImage extends Image {
                 .ease(TweenEquations.easeNone).setCallback(new TweenCallback() {
             @Override
             public void onEvent(int i, BaseTween<?> baseTween) {
-                System.out.println("disappear");
                 if (i == TweenCallback.COMPLETE && listener != null) {
                     listener.disappearCompleted(StarImage.this);
                 }
@@ -322,6 +309,7 @@ class StarImage extends Image {
 
         tm.update(delta);
     }
+
     public boolean isSelected() {
         return isSelected;
     }
@@ -329,15 +317,8 @@ class StarImage extends Image {
         this.isSelected = isSelected;
         //当星星选中为true时发送url数据到服务器
         if(isSelected) {
-            uni.getMethodRequestWithoutDomain("/plc_send_serial?plccmd="+this.getId(), new Net.HttpResponseListener() {
-                @Override
-                public void handleHttpResponse(Net.HttpResponse httpResponse) {}
-                @Override
-                public void failed(Throwable t) {}
-                @Override
-                public void cancelled() {}
-            });
-            System.out.println("+++++++++++++++++" + id);
+            PlcCommHelper.getInstance().simpleGet("/plc_send_serial?plccmd="+this.getId());
+            System.out.println("+++++++++++++++++" +UGameNetInstance.URL_PATH+ "/plc_send_serial?plccmd="+this.getId());
         }
     }
 
