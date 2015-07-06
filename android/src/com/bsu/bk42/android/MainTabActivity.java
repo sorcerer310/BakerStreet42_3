@@ -48,6 +48,7 @@ public class MainTabActivity extends TabActivity {
                     case R.id.main_tab_address:
                         m_tabHost.setCurrentTabByTag(Constant.mTextviewArray[0]);
                         MainTabActivity.game.setScreen(BakerStreet42.STARSCREEN);           //设置当前为星星界面
+//                        m_radioGroup.check(R.id.main_tab_find_friend);                      //模拟按下第三个按钮
                         break;
                     case R.id.main_tab_find_friend:
                         m_tabHost.setCurrentTabByTag(Constant.mTextviewArray[2]);

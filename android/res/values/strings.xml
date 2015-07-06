@@ -351,13 +351,13 @@
     <string name="alpha_version_alpha">测试版</string>
     <string name="main_map">地图</string>
     <string name="main_star">星阵</string>
-    <string name="main_addcontact">Activity3</string>
+    <string name="main_fire">放火</string>
+    <string name="main_chase">追击</string>
     <string name="main_delete">删除该聊天</string>
     <string name="main_delete_all">清空聊天消息</string>
     <string name="main_delete_qmessage">清空QQ离线消息</string>
     <string name="main_delete_tmessage">清空微博私信消息</string>
     <string name="main_delete_bottleentry">删除漂流瓶入口</string>
-    <string name="main_setting">设置</string>
     <string name="main_exit">退出</string>
     <string name="main_exit_title">退出微信</string>
     <string name="main_exit_warning">退出后，你将收不到新的消息。确定要退出？</string>

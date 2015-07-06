@@ -51,7 +51,7 @@
 			
 		 	<RadioButton 
 		 	    android:id="@+id/main_tab_find_friend" 
-		 	    android:text="@string/main_addcontact" 
+		 	    android:text="@string/main_fire"
 		 	    android:drawableTop="@drawable/tab_find_frd"
 		 	    android:textColor="@color/tab_text" 
 		 	    style="@style/MMTabButton" />
@@ -59,7 +59,7 @@
 		 	
 		 	<RadioButton 
 		 	    android:id="@+id/main_tab_settings" 
-		 	    android:text="@string/main_setting" 
+		 	    android:text="@string/main_chase"
 		 	    android:drawableTop="@drawable/tab_settings" 
 		 	    android:textColor="@color/tab_text"
 		 	    style="@style/MMTabButton" />

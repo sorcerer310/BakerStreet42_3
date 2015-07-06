@@ -20,7 +20,7 @@ public class BakerStreet42 extends Game {
 
 	@Override
 	public void create () {
-//		ms = new MapScreen();
+		ms = new MapScreen();
 		ss = new StarScreen();
 		this.setScreen(ss);
 	}
