@@ -38,7 +38,7 @@ public class StarScreen extends UGameScreen {
     private Texture tx_starbackground = null;                                                                      //星星背景
     private StarBackgroundImage sbi;                                                                                  //星星背景对象
 
-    private enum DRAWSTATE {NOMAL,DRAW};                                                                             //连线的绘制状态
+    private enum DRAWSTATE {NOMAL,DRAW,COMPLETE};                                                                  //连线的绘制状态
     private DRAWSTATE state = DRAWSTATE.NOMAL;                                                                       //当前连线状态
     private Vector2 movePoint = new Vector2();
 
@@ -81,6 +81,8 @@ public class StarScreen extends UGameScreen {
         stage.addListener(new DragListener(){
             @Override
             public boolean touchDown(InputEvent event, float x, float y, int pointer, int button) {
+                if(state == DRAWSTATE.COMPLETE)
+                    return true;
                 //当鼠标点在某个星星范围内设置为绘制的第一个点.
                 for(int i=0;i< currStars.size;i++){
                     if(currStars.get(i).hit(x- currStars.get(i).getX(),y- currStars.get(i).getY(),true)!=null) {
@@ -97,6 +99,8 @@ public class StarScreen extends UGameScreen {
             @Override
             public void touchUp(InputEvent event, float x, float y, int pointer, int button) {
                 super.touchUp(event, x, y, pointer, button);
+                if(state == DRAWSTATE.COMPLETE)
+                    return;
                 //当抬起鼠标时恢复绘状态
                 state = DRAWSTATE.NOMAL;
                 for(int i=0;i< currStars.size;i++)
@@ -161,16 +165,26 @@ public class StarScreen extends UGameScreen {
                             });
                             si.disappear();
                         }
+                        state = DRAWSTATE.COMPLETE;
                     }
                 }else{
-                    System.out.println("not right");
-                    //如果不正确,熄灭所有的灯
-                    Array<String> paths = new Array<String>();
-                    for(StarImage si:currStars)
-                        paths.add("/plc_send_serial?plccmd=N"+si.getId());
-//                    paths.add("/plc_send_serial?plccmd=NS0");
+                    String path = "";
+                    switch(currScreen){
+                        case 0:
+                            path = "/plc_send_serial?plccmd=NS0-3";
+                            break;
+                        case 1:
+                            path = "/plc_send_serial?plccmd=NS4-7";
+                            break;
+                        case 2:
+                            path = "/plc_send_serial?plccmd=NS8-20";
+                            break;
+                        default:
+                            break;
+                    }
 
-                    PlcCommHelper.getInstance().simpleGetMoreCmd(paths);
+                    PlcCommHelper.getInstance().simpleGet(path);
+                    System.out.println("not right:"+path);
                 }
                 linePoints.clear();                                                                                   //设置要绘制的拐点为空
             }
@@ -178,6 +192,8 @@ public class StarScreen extends UGameScreen {
             @Override
             public void touchDragged(InputEvent event, float x, float y, int pointer) {
                 super.touchDragged(event, x, y, pointer);
+                if(state == DRAWSTATE.COMPLETE)
+                    return;
                 if (state == DRAWSTATE.NOMAL)
                     state = DRAWSTATE.DRAW;                                                                           //切换到绘制状态
                 movePoint.set(event.getStageX(), event.getStageY());                                                  //设置移动时的坐标
