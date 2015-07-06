@@ -2,26 +2,20 @@ package com.bsu.bk42.screen;
 
 import aurelienribon.tweenengine.*;
 import com.badlogic.gdx.Gdx;
-import com.badlogic.gdx.Net;
-import com.badlogic.gdx.files.FileHandle;
 import com.badlogic.gdx.graphics.*;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.scenes.scene2d.*;
 import com.badlogic.gdx.scenes.scene2d.ui.Image;
-import com.badlogic.gdx.scenes.scene2d.ui.Table;
 import com.badlogic.gdx.scenes.scene2d.utils.DragListener;
 import com.badlogic.gdx.utils.Array;
-import com.badlogic.gdx.utils.ObjectMap;
-import com.badlogic.gdx.utils.PropertiesUtils;
+import com.badlogic.gdx.utils.Disposable;
 import com.badlogic.gdx.utils.viewport.StretchViewport;
 import com.bsu.bk42.PlcCommHelper;
 import com.ugame.gdx.tools.UGameScreen;
 import com.ugame.gdx.tween.accessor.ActorAccessor;
 import com.ugame.net.UGameNetInstance;
 
-import java.io.File;
-import java.util.Iterator;
 
 /**
  * 星星解锁
@@ -261,8 +255,9 @@ public class StarScreen extends UGameScreen {
 /**
  * 星星对象
  */
-class StarImage extends Image {
+class StarImage extends Image implements Disposable {
     private TweenManager tm = new TweenManager();                                                                     //动画管理器
+    private Timeline tl = null;
     private Vector2 movePoint = new Vector2();                                                                       //移动的点
     private String id ="";                                                                                            //当前星星的标识
     private boolean isSelected = false;                                                                            //标识是否被选择
@@ -271,16 +266,38 @@ class StarImage extends Image {
 
     public StarImage(Texture t){
         super(t);
+        this.setOrigin(this.getWidth()/2,this.getHeight()/2);
         Tween.registerAccessor(Image.class, new ActorAccessor());
-        Tween.to(this, ActorAccessor.ROTATION_CPOS_XY, 1.0f).target(360.0f)
-                .ease(TweenEquations.easeNone)
-                .repeat(-1, 0.0f).start(tm);
+        tl = Timeline.createSequence()
+                .push(
+                        Timeline.createParallel()
+                                .push(Tween.to(this,ActorAccessor.OPACITY,.5f).target(.3f)
+                                        .ease(TweenEquations.easeNone)
+                                )
+                                .push(Tween.to(this,ActorAccessor.SCALE_XY,.5f).target(.3f,.3f)
+                                        .ease(TweenEquations.easeNone)
+                                )
+                )
+                .push(
+                        Timeline.createParallel()
+                                .push(Tween.to(this,ActorAccessor.OPACITY,.5f).target(1.0f)
+                                                .ease(TweenEquations.easeNone)
+                                )
+                                .push(Tween.to(this,ActorAccessor.SCALE_XY,.5f).target(1.0f,1.0f)
+                                                .ease(TweenEquations.easeNone)
+                                )
+                ).repeat(-1,.0f).start();
+
+//        Tween.to(this, ActorAccessor.ROTATION_CPOS_XY, 1.0f).target(360.0f)
+//                .ease(TweenEquations.easeNone)
+//                .repeat(-1, 0.0f).start(tm);
     }
 
     /**
      * 消失动作
      */
     public void disappear(){
+        tm.killAll();
         Tween.to(this,ActorAccessor.OPACITY,1.0f).target(.0f)
                 .ease(TweenEquations.easeNone).setCallback(new TweenCallback() {
             @Override
@@ -293,6 +310,7 @@ class StarImage extends Image {
     }
 
     public void appear(){
+        tm.killAll();
         Tween.to(this,ActorAccessor.OPACITY,1.0f).target(1.0f)
                 .ease(TweenEquations.easeNone).setCallback(new TweenCallback() {
             @Override
@@ -306,7 +324,8 @@ class StarImage extends Image {
     @Override
     public void act(float delta) {
         super.act(delta);
-
+        if(tl!=null)
+            tl.update(delta);
         tm.update(delta);
     }
 
@@ -335,6 +354,12 @@ class StarImage extends Image {
             this.listener = listener;
     }
 
+    @Override
+    public void dispose() {
+        tl.kill();
+        tm.killAll();
+    }
+
     /**
      * 消失完成监听
      */
@@ -351,7 +376,6 @@ class StarBackgroundImage extends Image{
     TweenManager tm = new TweenManager();
 
     private MoveListener listener = null;
-
     public StarBackgroundImage(Texture t){
         super(t);
         this.setPosition(-this.getWidth()/3*2,(StarScreen.screenHeight-this.getHeight())/2);
