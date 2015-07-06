@@ -1,7 +1,7 @@
 buildscript {
     repositories {
         maven { url "http://maven.oschina.net/content/groups/public/"}
-        maven { url "http://42.121.78.119:8081/nexus/content/repositories/central/" }
+        maven { url "http://42.121.78.119:8081/nexus/content/groups/public/" }
         maven { url "https://oss.sonatype.org/content/repositories/snapshots/" }
     }
     dependencies {
@@ -25,8 +25,7 @@ allprojects {
     }
 
     repositories {
-        maven { url "http://maven.oschina.net/content/groups/public/"}
-        maven { url "http://42.121.78.119:8081/nexus/content/repositories/central/" }
+        maven { url "http://42.121.78.119:8081/nexus/content/groups/public/" }
         maven { url "http://42.121.78.119:8081/nexus/content/repositories/thirdparty/" }
 
         maven { url "https://oss.sonatype.org/content/repositories/snapshots/" }

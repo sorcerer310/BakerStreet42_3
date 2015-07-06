@@ -12,13 +12,16 @@ import com.badlogic.gdx.scenes.scene2d.ui.Image;
 import com.badlogic.gdx.scenes.scene2d.ui.Table;
 import com.badlogic.gdx.scenes.scene2d.utils.DragListener;
 import com.badlogic.gdx.utils.Array;
-import com.badlogic.gdx.utils.Disposable;
+import com.badlogic.gdx.utils.ObjectMap;
+import com.badlogic.gdx.utils.PropertiesUtils;
 import com.badlogic.gdx.utils.viewport.StretchViewport;
 import com.bsu.bk42.PlcCommHelper;
 import com.ugame.gdx.tools.UGameScreen;
 import com.ugame.gdx.tween.accessor.ActorAccessor;
 import com.ugame.net.UGameNetInstance;
 
+import java.io.File;
+import java.util.Iterator;
 
 /**
  * 星星解锁
@@ -40,7 +43,7 @@ public class StarScreen extends UGameScreen {
     private Vector2 movePoint = new Vector2();
 
     private Array<Vector2> linePoints = new Array<Vector2>();                                                             //要绘制的所有拐点
-    private int lineWidth = 2;                                                                                       //绘制的线段宽度
+    private int lineWidth = 5;                                                                                       //绘制的线段宽度
 
     public StarScreen(){
         screenWidth = 720.0f;                                                                                           //设置游戏界面的宽高
@@ -113,8 +116,6 @@ public class StarScreen extends UGameScreen {
                 }
                 //如果所有的点都正确,切到下一屏,并设置当前的星星为下一屏幕的星星
                 if(right) {
-                    //正确设置所有的灯都亮
-                    PlcCommHelper.getInstance().simpleGet("/plc_send_serial?plccmd=S01234");
                     if(currScreen<2) {
                         //当屏幕为前两个屏幕时移动到下个屏幕
                         for (StarImage si : currStars) {                                                                       //先移除当前屏幕的星星
@@ -122,12 +123,11 @@ public class StarScreen extends UGameScreen {
                                 @Override
                                 public void disappearCompleted(StarImage si) {
                                     if (++disappearCount == currStars.size) {
-                                        stage.getActors().removeValue(si, true);                                           //动画完成移除所有星星
                                         sbi.goRight();                                                                                      //背景向右移动
                                         currStars = all3ScreenStars.get(++currScreen);                                                 //切到下一屏的星星
 //                                    for(StarImage sii:currStars)                                                                       //增加新屏幕的星星
 //                                        stage.addActor(sii);
-
+                                        stage.getActors().removeValue(si, true);                                           //动画完成移除所有星星
                                     }
                                 }
 
@@ -148,10 +148,9 @@ public class StarScreen extends UGameScreen {
                                 public void disappearCompleted(StarImage si) {
                                     if (++disappearCount == currStars.size) {
 //                                        sbi.goRight();                                                                                      //背景向右移动
-                                        stage.getActors().removeValue(si, true);
                                         sbi.goScale();
 //                                        currStars = all3ScreenStars.get(++currScreen);                                                 //切到下一屏的星星
-                                  //动画完成移除所有星星
+                                        stage.getActors().removeValue(si, true);                                           //动画完成移除所有星星
                                     }
                                 }
 
@@ -164,15 +163,14 @@ public class StarScreen extends UGameScreen {
                         }
                     }
                 }else{
-                    System.out.println("not right:plc_send_serial?plccmd=NS0123");
-
+                    System.out.println("not right");
                     //如果不正确,熄灭所有的灯
-//                    Array<String> paths = new Array<String>();
-//                    for(StarImage si:currStars)
-//                        paths.add("/plc_send_serial?plccmd=N"+si.getId());
+                    Array<String> paths = new Array<String>();
+                    for(StarImage si:currStars)
+                        paths.add("/plc_send_serial?plccmd=N"+si.getId());
 //                    paths.add("/plc_send_serial?plccmd=NS0");
-                    //如果顺序不对灭掉所有当前屏幕的灯
-                    PlcCommHelper.getInstance().simpleGet("/plc_send_serial?plccmd=NS0123");
+
+                    PlcCommHelper.getInstance().simpleGetMoreCmd(paths);
                 }
                 linePoints.clear();                                                                                   //设置要绘制的拐点为空
             }
@@ -263,7 +261,7 @@ public class StarScreen extends UGameScreen {
 /**
  * 星星对象
  */
-class StarImage extends Image implements Disposable {
+class StarImage extends Image {
     private TweenManager tm = new TweenManager();                                                                     //动画管理器
     private Vector2 movePoint = new Vector2();                                                                       //移动的点
     private String id ="";                                                                                            //当前星星的标识
@@ -274,26 +272,9 @@ class StarImage extends Image implements Disposable {
     public StarImage(Texture t){
         super(t);
         Tween.registerAccessor(Image.class, new ActorAccessor());
-//        Tween.to(this, ActorAccessor.ROTATION_CPOS_XY, 1.0f).target(360.0f)
-//                .ease(TweenEquations.easeNone)
-//                .repeat(-1, 0.0f).start(tm);
-        this.setOrigin(this.getWidth() / 2, this.getHeight() / 2);
-        Timeline.createSequence()
-                .push(
-                        Timeline.createParallel()
-                                .push(Tween.to(this, ActorAccessor.OPACITY, .5f).target(.3f)
-                                        .ease(TweenEquations.easeNone))
-                                .push(Tween.to(this,ActorAccessor.SCALE_XY,.5f).target(.3f,.3f)
-                                        .ease(TweenEquations.easeNone))
-                )
-                .push(
-                        Timeline.createParallel()
-                                .push(Tween.to(this, ActorAccessor.OPACITY, .5f).target(1.0f)
-                                        .ease(TweenEquations.easeNone))
-                                .push(Tween.to(this, ActorAccessor.SCALE_XY, .5f).target(1.0f,1.0f)
-                                        .ease(TweenEquations.easeNone))
-                )
-                .repeat(-1, .0f).start(tm);
+        Tween.to(this, ActorAccessor.ROTATION_CPOS_XY, 1.0f).target(360.0f)
+                .ease(TweenEquations.easeNone)
+                .repeat(-1, 0.0f).start(tm);
     }
 
     /**
@@ -340,22 +321,19 @@ class StarImage extends Image implements Disposable {
             System.out.println("+++++++++++++++++" +UGameNetInstance.URL_PATH+ "/plc_send_serial?plccmd="+this.getId());
         }
     }
+
     public String getId() {
         return id;
     }
+
     public void setId(String id) {
         this.id = id;
     }
+
+
     public void setOpacityListener(OpacityListener listener) {
             this.listener = listener;
     }
-
-    @Override
-    public void dispose() {
-        tm.killAll();
-        tm = null;
-    }
-
 
     /**
      * 消失完成监听
