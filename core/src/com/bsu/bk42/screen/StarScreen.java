@@ -70,6 +70,8 @@ public class StarScreen extends UGameScreen {
         all3ScreenStars = init3ScreenStars(tx_star);
         currStars = all3ScreenStars.get(currScreen);
         for(StarImage si:currStars) {
+            Color color = si.getColor();
+            si.setColor(color.r,color.g,color.b,.0f);
             si.appear();
             stage.addActor(si);
         }
@@ -268,7 +270,7 @@ class StarImage extends Image implements Disposable {
         super(t);
         this.setOrigin(t.getWidth() / 2, t.getHeight() / 2);
         Tween.registerAccessor(Image.class, new ActorAccessor());
-        float delay = MathUtils.random(0.2f,0.8f);
+        float delay = MathUtils.random(0.5f,0.9f);
         float minval = MathUtils.random(0.2f,0.6f);
         tl = Timeline.createSequence()
                 .push(
@@ -295,7 +297,7 @@ class StarImage extends Image implements Disposable {
      * 消失动作
      */
     public void disappear(){
-        Tween.to(this, ActorAccessor.OPACITY, 1.0f).target(.0f)
+        Tween.to(this, ActorAccessor.OPACITY, .6f).target(.0f)
                 .ease(TweenEquations.easeNone).setCallback(new TweenCallback() {
             @Override
             public void onEvent(int i, BaseTween<?> baseTween) {
@@ -311,7 +313,7 @@ class StarImage extends Image implements Disposable {
      * 出现动作
      */
     public void appear(){
-        Tween.to(this,ActorAccessor.OPACITY,1.0f).target(1.0f)
+        Tween.to(this,ActorAccessor.OPACITY,.6f).target(1.0f)
                 .ease(TweenEquations.easeNone).setCallback(new TweenCallback() {
             @Override
             public void onEvent(int i, BaseTween<?> baseTween) {
