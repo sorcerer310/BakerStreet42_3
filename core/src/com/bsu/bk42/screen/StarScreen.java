@@ -4,6 +4,7 @@ import aurelienribon.tweenengine.*;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.*;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
+import com.badlogic.gdx.math.MathUtils;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.scenes.scene2d.*;
 import com.badlogic.gdx.scenes.scene2d.ui.Image;
@@ -68,8 +69,10 @@ public class StarScreen extends UGameScreen {
         tx_star = new Texture(Gdx.files.internal("star.png"));
         all3ScreenStars = init3ScreenStars(tx_star);
         currStars = all3ScreenStars.get(currScreen);
-        for(StarImage si:currStars)
+        for(StarImage si:currStars) {
+            si.appear();
             stage.addActor(si);
+        }
 
 
         stage.addListener(new DragListener(){
@@ -84,6 +87,7 @@ public class StarScreen extends UGameScreen {
                         linePoints.add(new Vector2(si.getX()+si.getWidth()/2,si.getY()+si.getHeight()/2));
                     }
                 }
+                System.out.println("x:"+x+" y:"+y);
 //                sbi.goRight();
                 return true;
             }
@@ -117,11 +121,10 @@ public class StarScreen extends UGameScreen {
                                 @Override
                                 public void disappearCompleted(StarImage si) {
                                     if (++disappearCount == currStars.size) {
-                                        sbi.goRight();                                                                                      //背景向右移动
-                                        currStars = all3ScreenStars.get(++currScreen);                                                 //切到下一屏的星星
-//                                    for(StarImage sii:currStars)                                                                       //增加新屏幕的星星
-//                                        stage.addActor(sii);
-                                        stage.getActors().removeValue(si, true);                                           //动画完成移除所有星星
+                                        sbi.goRight();                                                                  //背景向右移动
+                                        disappearCount = 0;                                                           //消失的星星统计归0
+                                        currStars = all3ScreenStars.get(++currScreen);                             //切到下一屏的星星
+                                        stage.getActors().removeValue(si, true);                                       //动画完成移除所有星星
                                     }
                                 }
 
@@ -141,9 +144,7 @@ public class StarScreen extends UGameScreen {
                                 @Override
                                 public void disappearCompleted(StarImage si) {
                                     if (++disappearCount == currStars.size) {
-//                                        sbi.goRight();                                                                                      //背景向右移动
                                         sbi.goScale();
-//                                        currStars = all3ScreenStars.get(++currScreen);                                                 //切到下一屏的星星
                                         stage.getActors().removeValue(si, true);                                           //动画完成移除所有星星
                                     }
                                 }
@@ -224,8 +225,8 @@ public class StarScreen extends UGameScreen {
         Array<StarImage> s = new Array<StarImage>();
         for(int i=0;i<count;i++) {
             StarImage si = new StarImage(t);
-            si.setId("S"+sumStarCount++);
-            si.setPosition(p[i][0],p[i][1]);
+            si.setId("S" + sumStarCount++);
+            si.setPosition(p[i][0]-si.getWidth()/2,p[i][1]-si.getHeight()/2);
             s.add(si);
         }
         return s;
@@ -238,10 +239,9 @@ public class StarScreen extends UGameScreen {
      */
     private Array<Array<StarImage>> init3ScreenStars(Texture t){
         Array<Array<StarImage>> sstars = new Array<Array<StarImage>>();
-        sstars.add(init1ScreenStars(t,4,new int[][]{{256,856},{160,756},{150,590},{200,400}}));
-        sstars.add(init1ScreenStars(t,5,new int[][]{{256,856},{160,756},{150,590},{200,400},{330,420}}));
-        sstars.add(init1ScreenStars(t,12,new int[][]{{256,856},{160,756},{150,590},{200,400},{330,420},{346,279},
-                {206,856},{110,756},{100,590},{150,400},{280,420},{296,279}}));
+        sstars.add(init1ScreenStars(t,4,new int[][]{{500,580},{261,700},{307,265},{60,382}}));
+        sstars.add(init1ScreenStars(t,8,new int[][]{{607,393},{391,505},{612,689},{520,955},{273,780},{171,523},{282,241},{39,360}}));
+        sstars.add(init1ScreenStars(t,9,new int[][]{{622,296},{390,398},{186,662},{526,545},{606,696},{639,782},{604,859},{351,857},{475,811}}));
         return sstars;
     }
 
@@ -264,59 +264,61 @@ class StarImage extends Image implements Disposable {
     private OpacityListener listener = null;                                                                      //监听消失操作是否完成
 
 
-    public StarImage(Texture t){
+    public StarImage(Texture t) {
         super(t);
-        this.setOrigin(this.getWidth()/2,this.getHeight()/2);
+        this.setOrigin(t.getWidth() / 2, t.getHeight() / 2);
         Tween.registerAccessor(Image.class, new ActorAccessor());
+        float delay = MathUtils.random(0.2f,0.8f);
+        float minval = MathUtils.random(0.2f,0.6f);
         tl = Timeline.createSequence()
                 .push(
                         Timeline.createParallel()
-                                .push(Tween.to(this,ActorAccessor.OPACITY,.5f).target(.3f)
-                                        .ease(TweenEquations.easeNone)
+                                .push(Tween.to(this, ActorAccessor.OPACITY, delay).target(minval)
+                                                .ease(TweenEquations.easeNone)
                                 )
-                                .push(Tween.to(this,ActorAccessor.SCALE_XY,.5f).target(.3f,.3f)
-                                        .ease(TweenEquations.easeNone)
+                                .push(Tween.to(this, ActorAccessor.SCALE_XY, delay).target(minval, minval)
+                                                .ease(TweenEquations.easeNone)
                                 )
                 )
                 .push(
                         Timeline.createParallel()
-                                .push(Tween.to(this,ActorAccessor.OPACITY,.5f).target(1.0f)
+                                .push(Tween.to(this, ActorAccessor.OPACITY, delay).target(1.0f)
                                                 .ease(TweenEquations.easeNone)
                                 )
-                                .push(Tween.to(this,ActorAccessor.SCALE_XY,.5f).target(1.0f,1.0f)
+                                .push(Tween.to(this, ActorAccessor.SCALE_XY, delay).target(1.0f, 1.0f)
                                                 .ease(TweenEquations.easeNone)
                                 )
-                ).repeat(-1,.0f).start();
-
-//        Tween.to(this, ActorAccessor.ROTATION_CPOS_XY, 1.0f).target(360.0f)
-//                .ease(TweenEquations.easeNone)
-//                .repeat(-1, 0.0f).start(tm);
+                ).repeat(-1, .0f);
     }
 
     /**
      * 消失动作
      */
     public void disappear(){
-        tm.killAll();
-        Tween.to(this,ActorAccessor.OPACITY,1.0f).target(.0f)
+        Tween.to(this, ActorAccessor.OPACITY, 1.0f).target(.0f)
                 .ease(TweenEquations.easeNone).setCallback(new TweenCallback() {
             @Override
             public void onEvent(int i, BaseTween<?> baseTween) {
-                if (i == TweenCallback.COMPLETE && listener != null) {
+                tl.kill();
+                tm.killAll();
+                if (i == TweenCallback.COMPLETE && listener != null)
                     listener.disappearCompleted(StarImage.this);
-                }
             }
         }).start(tm);
     }
 
+    /**
+     * 出现动作
+     */
     public void appear(){
-        tm.killAll();
         Tween.to(this,ActorAccessor.OPACITY,1.0f).target(1.0f)
                 .ease(TweenEquations.easeNone).setCallback(new TweenCallback() {
             @Override
             public void onEvent(int i, BaseTween<?> baseTween) {
-                if (i == TweenCallback.COMPLETE && listener != null)
+                tl.start();
+                if (i == TweenCallback.COMPLETE && listener != null) {
                     listener.appearCompleted(StarImage.this);
+                }
             }
         }).start(tm);
     }
