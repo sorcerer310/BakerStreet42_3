@@ -26,7 +26,7 @@ public class MapScreen extends UGameScreen {
     private Group mapgroup = new Group();                                                                           //加载所有元素的group
 
     public MapScreen(){
-        stage = new Stage(new StretchViewport(480.0F, 800.0f));
+        stage = new Stage(new StretchViewport(700.0F, 1280.0f));
 
         Array<Image> clouds = setClouds();
 
@@ -44,14 +44,18 @@ public class MapScreen extends UGameScreen {
             }
         };
 //        map = new Image(tx_map);
-        mapgroup.setBounds(0,0,800,1280);
+        mapgroup.setBounds(0, 0, tx_map.getWidth(), tx_map.getHeight());
         mapgroup.addActor(map);
         for(int i=0;i<clouds.size;i++)
             mapgroup.addActor(clouds.get(i));
 
         sp = new ScrollPane(mapgroup,new ScrollPane.ScrollPaneStyle());
-        sp.setBounds(0,0,720,1080);
+        sp.setBounds(0, 0, 700, 1280);
         sp.setWidget(mapgroup);
+        sp.invalidate();
+        sp.validate();
+        sp.setScrollPercentX(1.0f);
+        sp.setScrollPercentY(1.0f);
         stage.addActor(sp);
 
     }
@@ -81,4 +85,21 @@ public class MapScreen extends UGameScreen {
     }
 
 
+}
+
+/**
+ * 地图上的标记
+ *
+ */
+class Mark extends Actor{
+    private Texture tx = new Texture(Gdx.files.internal("mark.png"));
+    public Mark(){
+
+    }
+
+    @Override
+    public void draw(Batch batch, float parentAlpha) {
+        super.draw(batch, parentAlpha);
+        batch.draw(tx,this.getX(),this.getY());
+    }
 }

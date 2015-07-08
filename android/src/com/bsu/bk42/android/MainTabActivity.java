@@ -3,6 +3,7 @@ package com.bsu.bk42.android;
 import android.app.Activity;
 import android.app.TabActivity;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -13,6 +14,9 @@ import com.bsu.bk42.BakerStreet42;
 
 
 public class MainTabActivity extends TabActivity {
+    //程序列表持久数据，防止玩家退出程序再进入获得的数据不对，如要重置需要在游戏重置功能操作
+    private SharedPreferences settings;
+
     private TabHost m_tabHost;
     private RadioGroup m_radioGroup;
 
@@ -60,5 +64,26 @@ public class MainTabActivity extends TabActivity {
             }
         });
         ((RadioButton) m_radioGroup.getChildAt(0)).toggle();
+    }
+
+    private void initPreferences(){
+        settings = this.getSharedPreferences("StatusDatas",MODE_PRIVATE);
+        SharedPreferences.Editor editor = settings.edit();
+
+        //地图的状态
+        //0:初始.1:星盘.2:乌龟.3:插旗.4:军令.5:守关3处.6:追击.7:守关4处放火.8:铁锁连环.9:草船借箭.10:擂鼓助威.
+        //11:借东风.12:放火.13:选择追击路线
+        editor.putInt("map",0);
+
+        //星盘完成状态
+        editor.putBoolean("stars",false);
+
+        //放火
+        //0:初始状态. 1:博望坡放火完成 2:铁锁连环放火完成
+        editor.putInt("fire",0);
+
+        //追击
+        //0:初始. 1:选择大路追击 2:选择小路追击
+        editor.putInt("fllowup",0);
     }
 }
