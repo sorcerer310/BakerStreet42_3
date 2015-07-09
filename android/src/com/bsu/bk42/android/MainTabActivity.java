@@ -11,6 +11,7 @@ import android.widget.RadioButton;
 import android.widget.RadioGroup;
 import android.widget.TabHost;
 import com.bsu.bk42.BakerStreet42;
+import org.androidpn.client.Constants;
 
 
 public class MainTabActivity extends TabActivity {
@@ -30,6 +31,9 @@ public class MainTabActivity extends TabActivity {
         init();
     }
 
+    /**
+     * 初始化主界面
+     */
     private void init(){
         m_tabHost = getTabHost();
         int count = Constant.mTabClassArray.length;
@@ -66,6 +70,32 @@ public class MainTabActivity extends TabActivity {
         ((RadioButton) m_radioGroup.getChildAt(0)).toggle();
     }
 
+    /**
+     * 初始化意图
+     */
+    private void initIntent(){
+        Intent intent = this.getIntent();
+        String urivalue = intent.getStringExtra(Constants.NOTIFICATION_URI);
+        if(urivalue.contains(":")){
+            String[] ss  = urivalue.split(":");
+            //如果发来的消息为地图
+            if(ss[0].equals("map")){
+                m_radioGroup.check(R.id.main_tab_map);
+
+            }
+        }else{
+            //如果发来的消息为放火
+            if(urivalue.equals("fire"))
+                m_radioGroup.check(R.id.main_tab_fire);
+            //如果发来的消息为追击
+            else if(urivalue.equals("followup"))
+                m_radioGroup.check(R.id.main_tab_followup);
+        }
+    }
+
+    /**
+     * 初始化配置参数
+     */
     private void initPreferences(){
         settings = this.getSharedPreferences("StatusDatas",MODE_PRIVATE);
         SharedPreferences.Editor editor = settings.edit();

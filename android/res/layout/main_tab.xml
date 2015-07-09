@@ -34,7 +34,7 @@
 		android:layout_width="fill_parent" 
 		android:layout_height="wrap_content">
 			<RadioButton 
-			    android:id="@+id/main_tab_weixin" 
+			    android:id="@+id/main_tab_map"
 			    android:checked="true" 
 			    android:text="@string/main_map"
 			    android:drawableTop="@drawable/tab_weixin"
@@ -43,14 +43,14 @@
 
 
 		 	<RadioButton 
-                android:id="@+id/main_tab_address" 
+                android:id="@+id/main_tab_star"
                 android:text="@string/main_star"
                 android:drawableTop="@drawable/tab_address" 
                 android:textColor="@color/tab_text"
                 style="@style/MMTabButton" />
 			
 		 	<RadioButton 
-		 	    android:id="@+id/main_tab_find_friend" 
+		 	    android:id="@+id/main_tab_fire"
 		 	    android:text="@string/main_fire"
 		 	    android:drawableTop="@drawable/tab_find_frd"
 		 	    android:textColor="@color/tab_text" 
@@ -58,7 +58,7 @@
 		 	
 		 	
 		 	<RadioButton 
-		 	    android:id="@+id/main_tab_settings" 
+		 	    android:id="@+id/main_tab_followup"
 		 	    android:text="@string/main_chase"
 		 	    android:drawableTop="@drawable/tab_settings" 
 		 	    android:textColor="@color/tab_text"

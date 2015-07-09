@@ -22,7 +22,7 @@ public class BakerStreet42 extends Game {
 	public void create () {
 		ms = new MapScreen();
 		ss = new StarScreen();
-		this.setScreen(ms);
+		this.setScreen(ss);
 	}
 
 	/**
@@ -38,5 +38,13 @@ public class BakerStreet42 extends Game {
 				this.setScreen(ss);
 				break;
 		}
+	}
+
+	/**
+	 * 设置地图当前的显示索引
+	 * @param id	地图当前显示到的机关索引
+	 */
+	public void setMapCurrIndex(int id){
+
 	}
 }
