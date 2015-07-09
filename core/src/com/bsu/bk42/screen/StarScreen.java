@@ -243,9 +243,9 @@ public class StarScreen extends UGameScreen {
      */
     private Array<Array<StarImage>> init3ScreenStars(Texture t){
         Array<Array<StarImage>> sstars = new Array<Array<StarImage>>();
-        sstars.add(init1ScreenStars(t,4,new int[][]{{500,580},{261,700},{307,265},{60,382}}));
-        sstars.add(init1ScreenStars(t,8,new int[][]{{607,393},{391,505},{612,689},{520,955},{273,780},{171,523},{282,241},{39,360}}));
-        sstars.add(init1ScreenStars(t,9,new int[][]{{622,296},{390,398},{186,662},{526,545},{606,696},{639,782},{604,859},{351,857},{475,811}}));
+        sstars.add(init1ScreenStars(t,3,new int[][]{{393,673},{126,478},{231,297}}));
+        sstars.add(init1ScreenStars(t,8,new int[][]{{658,364},{562,480},{388,505},{633,870},{418,947},{178,577}  ,{58,380},{153,265}}));
+        sstars.add(init1ScreenStars(t,10,new int[][]{{412,352},{268,534},{526,548},{579,675},{523,742},{604,793} ,{603,860},{350,860},{348,676},{472,809}}));
         return sstars;
     }
 
