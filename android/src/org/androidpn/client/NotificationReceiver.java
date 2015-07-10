@@ -15,17 +15,14 @@
  */
 package org.androidpn.client;
 
-import java.util.Map;
-
-import com.bsu.bakerstreet42_ghost.R;
-import com.bsu.bakerstreet42_ghost.VideoActivity;
-import com.bsu.bakerstreet42_ghost.tools.Utils;
 
 import android.app.KeyguardManager;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.util.Log;
+import com.bsu.bk42.android.MainTabActivity;
+import com.bsu.bk42.android.R;
 
 /** 
  * Broadcast receiver that handles push notification messages from the server.
@@ -75,32 +72,51 @@ public final class NotificationReceiver extends BroadcastReceiver {
             Log.d(LOGTAG, "notificationMessage=" + notificationMessage);
             Log.d(LOGTAG, "notificationUri=" + notificationUri);
 
-            
-            //先获得视频数据
-            Map<String,String> m = Utils.parseVideoData(notificationUri);
-            //判断该视频如果已存在,就不发送,如果不存在则发送视频到手机
-            if(!Utils.isVideoExistSharedPreferences(context, notificationUri)){
-	            //如果锁屏发出通知。否则直接显示指定的Activity
-	            if(NotificationReceiver.isScreenLocked(context)){
-	            	Notifier notifier = new Notifier(context);
-	//            	notifier.notify(notificationId, notificationApiKey,
-	//                    notificationTitle, notificationMessage, notificationUri,notificationFrom,packetId);
-	            	notifier.notify(notificationId, notificationApiKey,
-	            		"贝克街42号-凶宅:"+m.get("vtitle").toString(), notificationMessage, notificationUri,notificationFrom,packetId);
-	            }else{
-	
-	            	Intent nintent = new Intent(context,VideoActivity.class);
-	            	nintent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-	
-	        		nintent.putExtra("title", m.get("vtitle").toString());
-	        		nintent.putExtra("vpath", m.get("vpath").toString());
-	
-	        		//向持久化数据中增加对应的数据
-	        		Utils.saveSharedPreferences(context, notificationUri);
-	        		
-	            	context.startActivity(nintent);
-	            }
+            //此处做了修改,判断当前是否锁屏,如果锁屏发消息,否则直接转到对应的Activity
+            if(NotificationReceiver.isScreenLocked(context)){
+                //收到消息后,如果屏幕锁屏,把消息传递给Notifier对象,让Notifier在通知栏通知用户
+                Notifier notifier = new Notifier(context);
+                notifier.notify(notificationId, notificationApiKey,
+	                    notificationTitle, notificationMessage, notificationUri,notificationFrom,packetId);
+            }else{
+                //如果未锁屏,直接把对应消息传给主类
+                Intent nintent = new Intent(context,MainTabActivity.class);
+                nintent.putExtra(Constants.NOTIFICATION_ID,notificationId);
+                nintent.putExtra(Constants.NOTIFICATION_API_KEY,notificationApiKey);
+                nintent.putExtra(Constants.NOTIFICATION_TITLE,notificationTitle);
+                nintent.putExtra(Constants.NOTIFICATION_MESSAGE,notificationMessage);
+                nintent.putExtra(Constants.NOTIFICATION_URI,notificationUri);
+                nintent.putExtra(Constants.NOTIFICATION_FROM,notificationFrom);
+                nintent.putExtra(Constants.PACKET_ID,packetId);
+
+                context.startActivity(nintent);
             }
+            
+//            //先获得视频数据
+//            Map<String,String> m = Utils.parseVideoData(notificationUri);
+//            //判断该视频如果已存在,就不发送,如果不存在则发送视频到手机
+//            if(!Utils.isVideoExistSharedPreferences(context, notificationUri)){
+//	            //如果锁屏发出通知。否则直接显示指定的Activity
+//	            if(NotificationReceiver.isScreenLocked(context)){
+//	            	Notifier notifier = new Notifier(context);
+//	//            	notifier.notify(notificationId, notificationApiKey,
+//	//                    notificationTitle, notificationMessage, notificationUri,notificationFrom,packetId);
+//	            	notifier.notify(notificationId, notificationApiKey,
+//	            		"贝克街42号-凶宅:"+m.get("vtitle").toString(), notificationMessage, notificationUri,notificationFrom,packetId);
+//	            }else{
+//
+//	            	Intent nintent = new Intent(context,VideoActivity.class);
+//	            	nintent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+//
+//	        		nintent.putExtra("title", m.get("vtitle").toString());
+//	        		nintent.putExtra("vpath", m.get("vpath").toString());
+//
+//	        		//向持久化数据中增加对应的数据
+//	        		Utils.saveSharedPreferences(context, notificationUri);
+//
+//	            	context.startActivity(nintent);
+//	            }
+//            }
         }
     } 
     /**

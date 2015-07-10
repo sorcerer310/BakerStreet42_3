@@ -7,7 +7,7 @@ import com.badlogic.gdx.utils.ObjectMap;
 import com.badlogic.gdx.utils.PropertiesUtils;
 
 /**
- * PLCÍ¨Ñ¶°ïÖúÀà
+ * PLCé€šè®¯å¸®åŠ©ç±»
  * Created by Administrator on 2015/7/3.
  */
 public class PlcCommHelper {
@@ -28,8 +28,8 @@ public class PlcCommHelper {
     }
 
     /**
-     * ¼òµ¥µÄgetÇëÇó,Ò»°ã²»ĞèÒª·µ»ØÖµ,Ö»ÓÃÓÚÄ³Ğ©Ò»´ÎĞÔ²Ù×÷
-     * @param path   ²»´øÓòÃûÂ·¾¶¼°²ÎÊı,ÒÔ"/"¿ªÍ·
+     * ç®€å•çš„getè¯·æ±‚,ä¸€èˆ¬ä¸éœ€è¦è¿”å›å€¼,åªç”¨äºæŸäº›ä¸€æ¬¡æ€§æ“ä½œ
+     * @param path   ä¸å¸¦åŸŸåè·¯å¾„åŠå‚æ•°,ä»¥"/"å¼€å¤´
      */
     public void simpleGet(String path){
         Net.HttpRequest request = new Net.HttpRequest(Net.HttpMethods.GET);
@@ -45,8 +45,8 @@ public class PlcCommHelper {
     }
 
     /**
-     * Ò»´Î·¢ËÍ¶àÌõÖ¸Áî,Ã¿ÌõÖ¸Áî¼äÓĞ500msÑÓ³Ù
-     * @param path  ¶à¸öÖ¸ÁîµÄÂ·¾¶
+     * ä¸€æ¬¡å‘é€å¤šæ¡æŒ‡ä»¤,æ¯æ¡æŒ‡ä»¤é—´æœ‰500mså»¶è¿Ÿ
+     * @param path  å¤šä¸ªæŒ‡ä»¤çš„è·¯å¾„
      */
     public void simpleGetMoreCmd(Array<String> path){
         for(String p:path){

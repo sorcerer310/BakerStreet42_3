@@ -12,11 +12,11 @@ import com.bsu.bk42.screen.StarScreen;
 public class BakerStreet42 extends Game {
 //	SpriteBatch batch;
 //	Texture img;
-	public static final int MAPSCREEN = 0;																			//µØÍ¼³¡¾°µÄÄ¬ÈÏË÷Òı
-	public static final int STARSCREEN = 1;																		//ĞÇĞÇ³¡¾°µÄÄ¬ÈÏË÷Òı
+	public static final int MAPSCREEN = 0;																			//åœ°å›¾åœºæ™¯çš„é»˜è®¤ç´¢å¼•
+	public static final int STARSCREEN = 1;																		//æ˜Ÿæ˜Ÿåœºæ™¯çš„é»˜è®¤ç´¢å¼•
 
-	private MapScreen ms = null;																						//µØÍ¼³¡¾°
-	private StarScreen ss = null;																						//ĞÇĞÇ³¡¾°
+	private MapScreen ms = null;																						//åœ°å›¾åœºæ™¯
+	private StarScreen ss = null;																						//æ˜Ÿæ˜Ÿåœºæ™¯
 
 	@Override
 	public void create () {
@@ -26,8 +26,8 @@ public class BakerStreet42 extends Game {
 	}
 
 	/**
-	 * ÉèÖÃµ±Ç°³¡¾°
-	 * @param map	¶ÔÓ¦³¡¾°µÄË÷Òı
+	 * è®¾ç½®å½“å‰åœºæ™¯
+	 * @param map	å¯¹åº”åœºæ™¯çš„ç´¢å¼•
 	 */
 	public void setScreen(int map){
 		switch(map) {
@@ -41,8 +41,8 @@ public class BakerStreet42 extends Game {
 	}
 
 	/**
-	 * ÉèÖÃµØÍ¼µ±Ç°µÄÏÔÊ¾Ë÷Òı
-	 * @param id	µØÍ¼µ±Ç°ÏÔÊ¾µ½µÄ»ú¹ØË÷Òı
+	 * è®¾ç½®åœ°å›¾å½“å‰çš„æ˜¾ç¤ºç´¢å¼•
+	 * @param id	åœ°å›¾å½“å‰æ˜¾ç¤ºåˆ°çš„æœºå…³ç´¢å¼•
 	 */
 	public void setMapCurrIndex(int id){
 

@@ -70,7 +70,7 @@ public class NotificationPacketListener implements PacketListener {
                 intent.putExtra(Constants.NOTIFICATION_FROM, notificationFrom);
                 intent.putExtra(Constants.PACKET_ID, packetId);
                 
-                //TODO FIXME 发送收到通知回执
+                //TODO FIXME 鍙戦�佹敹鍒伴�氱煡鍥炴墽
                 IQ result = NotificationIQ.createResultIQ(notification);
                 
                 try{

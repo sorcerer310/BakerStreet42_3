@@ -83,7 +83,7 @@ public class Notifier {
             notification.tickerText = message;
 
 //            Intent intent = new Intent(context,NotificationDetailsActivity.class);
-            //创建开启VideoActivity类的意图.并向持久数据中增加该信息的数据
+            //通知栏的消息点击后,直接转到要显示的主activity
             Intent intent = new Intent(context,MainTabActivity.class);
 
             intent.putExtra(Constants.NOTIFICATION_ID, notificationId);

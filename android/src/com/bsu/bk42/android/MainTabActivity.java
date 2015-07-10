@@ -15,13 +15,13 @@ import org.androidpn.client.Constants;
 
 
 public class MainTabActivity extends TabActivity {
-    //³ÌĞòÁĞ±í³Ö¾ÃÊı¾İ£¬·ÀÖ¹Íæ¼ÒÍË³ö³ÌĞòÔÙ½øÈë»ñµÃµÄÊı¾İ²»¶Ô£¬ÈçÒªÖØÖÃĞèÒªÔÚÓÎÏ·ÖØÖÃ¹¦ÄÜ²Ù×÷
+    //ç¨‹åºåˆ—è¡¨æŒä¹…æ•°æ®ï¼Œé˜²æ­¢ç©å®¶é€€å‡ºç¨‹åºå†è¿›å…¥è·å¾—çš„æ•°æ®ä¸å¯¹ï¼Œå¦‚è¦é‡ç½®éœ€è¦åœ¨æ¸¸æˆé‡ç½®åŠŸèƒ½æ“ä½œ
     private SharedPreferences settings;
 
     private TabHost m_tabHost;
     private RadioGroup m_radioGroup;
 
-    public static BakerStreet42 game= null;                                             //È«¾Ögame¶ÔÏó£¬±£Ö¤ÔÚÈÎºÎactivityÖĞ¶¼¿ÉÒÔµ÷ÓÃµ½¡£
+    public static BakerStreet42 game= null;                                             //å…¨å±€gameå¯¹è±¡ï¼Œä¿è¯åœ¨ä»»ä½•activityä¸­éƒ½å¯ä»¥è°ƒç”¨åˆ°ã€‚
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -32,7 +32,7 @@ public class MainTabActivity extends TabActivity {
     }
 
     /**
-     * ³õÊ¼»¯Ö÷½çÃæ
+     * åˆå§‹åŒ–ä¸»ç•Œé¢
      */
     private void init(){
         m_tabHost = getTabHost();
@@ -49,19 +49,19 @@ public class MainTabActivity extends TabActivity {
             @Override
             public void onCheckedChanged(RadioGroup radioGroup, int checkedId) {
                 switch (checkedId) {
-                    case R.id.main_tab_weixin:
+                    case R.id.main_tab_map:
                         m_tabHost.setCurrentTabByTag(Constant.mTextviewArray[0]);
-                        MainTabActivity.game.setScreen(BakerStreet42.MAPSCREEN);            //ÉèÖÃµ±Ç°ÎªµØÍ¼½çÃæ
+                        MainTabActivity.game.setScreen(BakerStreet42.MAPSCREEN);            //è®¾ç½®å½“å‰ä¸ºåœ°å›¾ç•Œé¢
                         break;
-                    case R.id.main_tab_address:
+                    case R.id.main_tab_star:
                         m_tabHost.setCurrentTabByTag(Constant.mTextviewArray[0]);
-                        MainTabActivity.game.setScreen(BakerStreet42.STARSCREEN);           //ÉèÖÃµ±Ç°ÎªĞÇĞÇ½çÃæ
-//                        m_radioGroup.check(R.id.main_tab_find_friend);                      //Ä£Äâ°´ÏÂµÚÈı¸ö°´Å¥
+                        MainTabActivity.game.setScreen(BakerStreet42.STARSCREEN);           //è®¾ç½®å½“å‰ä¸ºæ˜Ÿæ˜Ÿç•Œé¢
+//                        m_radioGroup.check(R.id.main_tab_find_friend);                      //æ¨¡æ‹ŸæŒ‰ä¸‹ç¬¬ä¸‰ä¸ªæŒ‰é’®
                         break;
-                    case R.id.main_tab_find_friend:
+                    case R.id.main_tab_fire:
                         m_tabHost.setCurrentTabByTag(Constant.mTextviewArray[2]);
                         break;
-                    case R.id.main_tab_settings:
+                    case R.id.main_tab_followup:
                         m_tabHost.setCurrentTabByTag(Constant.mTextviewArray[3]);
                         break;
                 }
@@ -71,49 +71,49 @@ public class MainTabActivity extends TabActivity {
     }
 
     /**
-     * ³õÊ¼»¯ÒâÍ¼
+     * åˆå§‹åŒ–æ„å›¾
      */
     private void initIntent(){
         Intent intent = this.getIntent();
         String urivalue = intent.getStringExtra(Constants.NOTIFICATION_URI);
         if(urivalue.contains(":")){
             String[] ss  = urivalue.split(":");
-            //Èç¹û·¢À´µÄÏûÏ¢ÎªµØÍ¼
+            //å¦‚æœå‘æ¥çš„æ¶ˆæ¯ä¸ºåœ°å›¾
             if(ss[0].equals("map")){
                 m_radioGroup.check(R.id.main_tab_map);
 
             }
         }else{
-            //Èç¹û·¢À´µÄÏûÏ¢Îª·Å»ğ
+            //å¦‚æœå‘æ¥çš„æ¶ˆæ¯ä¸ºæ”¾ç«
             if(urivalue.equals("fire"))
                 m_radioGroup.check(R.id.main_tab_fire);
-            //Èç¹û·¢À´µÄÏûÏ¢Îª×·»÷
+            //å¦‚æœå‘æ¥çš„æ¶ˆæ¯ä¸ºè¿½å‡»
             else if(urivalue.equals("followup"))
                 m_radioGroup.check(R.id.main_tab_followup);
         }
     }
 
     /**
-     * ³õÊ¼»¯ÅäÖÃ²ÎÊı
+     * åˆå§‹åŒ–é…ç½®å‚æ•°
      */
     private void initPreferences(){
         settings = this.getSharedPreferences("StatusDatas",MODE_PRIVATE);
         SharedPreferences.Editor editor = settings.edit();
 
-        //µØÍ¼µÄ×´Ì¬
-        //0:³õÊ¼.1:ĞÇÅÌ.2:ÎÚ¹ê.3:²åÆì.4:¾üÁî.5:ÊØ¹Ø3´¦.6:×·»÷.7:ÊØ¹Ø4´¦·Å»ğ.8:ÌúËøÁ¬»·.9:²İ´¬½è¼ı.10:ÀŞ¹ÄÖúÍş.
-        //11:½è¶«·ç.12:·Å»ğ.13:Ñ¡Ôñ×·»÷Â·Ïß
+        //åœ°å›¾çš„çŠ¶æ€
+        //0:åˆå§‹.1:æ˜Ÿç›˜.2:ä¹Œé¾Ÿ.3:æ’æ——.4:å†›ä»¤.5:å®ˆå…³3å¤„.6:è¿½å‡».7:å®ˆå…³4å¤„æ”¾ç«.8:é“é”è¿ç¯.9:è‰èˆ¹å€Ÿç®­.10:æ“‚é¼“åŠ©å¨.
+        //11:å€Ÿä¸œé£.12:æ”¾ç«.13:é€‰æ‹©è¿½å‡»è·¯çº¿
         editor.putInt("map",0);
 
-        //ĞÇÅÌÍê³É×´Ì¬
+        //æ˜Ÿç›˜å®ŒæˆçŠ¶æ€
         editor.putBoolean("stars",false);
 
-        //·Å»ğ
-        //0:³õÊ¼×´Ì¬. 1:²©ÍûÆÂ·Å»ğÍê³É 2:ÌúËøÁ¬»··Å»ğÍê³É
+        //æ”¾ç«
+        //0:åˆå§‹çŠ¶æ€. 1:åšæœ›å¡æ”¾ç«å®Œæˆ 2:é“é”è¿ç¯æ”¾ç«å®Œæˆ
         editor.putInt("fire",0);
 
-        //×·»÷
-        //0:³õÊ¼. 1:Ñ¡Ôñ´óÂ·×·»÷ 2:Ñ¡ÔñĞ¡Â·×·»÷
+        //è¿½å‡»
+        //0:åˆå§‹. 1:é€‰æ‹©å¤§è·¯è¿½å‡» 2:é€‰æ‹©å°è·¯è¿½å‡»
         editor.putInt("fllowup",0);
     }
 }

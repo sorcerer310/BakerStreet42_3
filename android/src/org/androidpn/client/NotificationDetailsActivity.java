@@ -82,7 +82,7 @@ public class NotificationDetailsActivity extends Activity {
         Log.d(LOGTAG, "notificationMessage=" + notificationMessage);
         Log.d(LOGTAG, "notificationUri=" + notificationUri);
         
-        //TODO FIXME ·¢ËÍ²é¿´»ØÖ´
+        //TODO FIXME å‘é€æŸ¥çœ‹å›æ‰§
         IQ result = new IQ() {
 			@Override
 			public String getChildElementXML() {
