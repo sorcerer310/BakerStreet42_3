@@ -88,6 +88,7 @@ public final class NotificationReceiver extends BroadcastReceiver {
                 nintent.putExtra(Constants.NOTIFICATION_URI,notificationUri);
                 nintent.putExtra(Constants.NOTIFICATION_FROM,notificationFrom);
                 nintent.putExtra(Constants.PACKET_ID,packetId);
+                nintent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
 
                 context.startActivity(nintent);
             }

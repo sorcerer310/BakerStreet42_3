@@ -12,6 +12,7 @@ import android.widget.RadioGroup;
 import android.widget.TabHost;
 import com.bsu.bk42.BakerStreet42;
 import org.androidpn.client.Constants;
+import org.androidpn.client.ServiceManager;
 
 
 public class MainTabActivity extends TabActivity {
@@ -28,7 +29,10 @@ public class MainTabActivity extends TabActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.main_tab);
         game = new BakerStreet42();
+        game.setScreen(BakerStreet42.MAPSCREEN);
         init();
+        initservice();
+        initIntent();
     }
 
     /**
@@ -56,7 +60,6 @@ public class MainTabActivity extends TabActivity {
                     case R.id.main_tab_star:
                         m_tabHost.setCurrentTabByTag(Constant.mTextviewArray[0]);
                         MainTabActivity.game.setScreen(BakerStreet42.STARSCREEN);           //设置当前为星星界面
-//                        m_radioGroup.check(R.id.main_tab_find_friend);                      //模拟按下第三个按钮
                         break;
                     case R.id.main_tab_fire:
                         m_tabHost.setCurrentTabByTag(Constant.mTextviewArray[2]);
@@ -76,6 +79,8 @@ public class MainTabActivity extends TabActivity {
     private void initIntent(){
         Intent intent = this.getIntent();
         String urivalue = intent.getStringExtra(Constants.NOTIFICATION_URI);
+        if(urivalue==null)
+            return;
         if(urivalue.contains(":")){
             String[] ss  = urivalue.split(":");
             //如果发来的消息为地图
@@ -115,5 +120,14 @@ public class MainTabActivity extends TabActivity {
         //追击
         //0:初始. 1:选择大路追击 2:选择小路追击
         editor.putInt("fllowup",0);
+    }
+
+    /**
+     * 开启接收消息的服务
+     */
+    private void initservice(){
+        ServiceManager serviceManager = new ServiceManager(this);
+        serviceManager.setNotificationIcon(R.drawable.notification);
+        serviceManager.startService();
     }
 }

@@ -6,7 +6,7 @@ import android.os.Bundle;
 
 public class Constant {
 
-	public static String mTextviewArray[] = {"Activity1", "Activity2", "Activity3", "Activity4"};
+	public static String mTextviewArray[] = {"AndroidLauncher", "AndroidLauncher", "Activity3", "Activity4"};
 	
 	public static Class mTabClassArray[]= {AndroidLauncher.class,
 		AndroidLauncher.class,
