@@ -86,7 +86,7 @@ public class MainTabActivity extends TabActivity {
             //如果发来的消息为地图
             if(ss[0].equals("map")){
                 m_radioGroup.check(R.id.main_tab_map);
-
+                game.setMapCurrIndex(ss[1]);
             }
         }else{
             //如果发来的消息为放火

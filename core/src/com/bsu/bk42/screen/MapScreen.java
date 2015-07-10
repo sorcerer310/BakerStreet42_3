@@ -4,8 +4,10 @@ import aurelienribon.tweenengine.Timeline;
 import aurelienribon.tweenengine.Tween;
 import aurelienribon.tweenengine.TweenEquations;
 import com.badlogic.gdx.Gdx;
+import com.badlogic.gdx.InputAdapter;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.Batch;
+import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.scenes.scene2d.*;
 import com.badlogic.gdx.scenes.scene2d.ui.Image;
 import com.badlogic.gdx.scenes.scene2d.ui.ScrollPane;
@@ -28,7 +30,6 @@ public class MapScreen extends UGameScreen {
     private Texture tx_cloud = null;
 
     private Group mapgroup = new Group();                                                                           //加载地图上所有元素的group
-
     public MapScreen(){
         stage = new Stage(new StretchViewport(700.0F, 1280.0f));
 
@@ -36,7 +37,6 @@ public class MapScreen extends UGameScreen {
         initMapGroup();
         //初始化滚动控件
         initScrollPane();
-
     }
 
 
@@ -50,6 +50,16 @@ public class MapScreen extends UGameScreen {
             {
                 this.setWidth(tx_map.getWidth());
                 this.setHeight(tx_map.getHeight());
+
+                this.addListener(new InputListener() {
+
+                    @Override
+                    public boolean touchDown(InputEvent event, float x, float y, int pointer, int button) {
+                        System.out.println("x:"+x+"   y:"+y);
+                        return super.touchDown(event, x, y, pointer, button);
+                    }
+                });
+
             }
             @Override
             public void draw(Batch batch, float parentAlpha) {
@@ -57,6 +67,7 @@ public class MapScreen extends UGameScreen {
                 if(tx_map!=null)
                     batch.draw(tx_map, this.getX(), this.getY());
             }
+
         };
 
 //        map = new Image(tx_map);
@@ -91,7 +102,7 @@ public class MapScreen extends UGameScreen {
     /**
      * 设置迷雾云彩
      */
-    public Array<Image> setClouds(){
+    public Array<Image> makeClouds(){
         tx_cloud = new Texture(Gdx.files.internal("clouds/cloud1.png"));
         clouds = new Array<Image>();
         for(int i=0;i<3;i++) {
@@ -104,6 +115,14 @@ public class MapScreen extends UGameScreen {
         clouds.get(1).setPosition(200,200);
         clouds.get(2).setPosition(150,700);
         return clouds;
+    }
+
+    /**
+     * 生成所有地图标记
+     * @return
+     */
+    public Array<Mark> makeMarks(){
+        return null;
     }
 
     @Override

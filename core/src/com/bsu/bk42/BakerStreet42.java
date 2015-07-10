@@ -6,6 +6,8 @@ import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
+import com.badlogic.gdx.math.Vector2;
+import com.badlogic.gdx.utils.Array;
 import com.bsu.bk42.screen.MapScreen;
 import com.bsu.bk42.screen.StarScreen;
 
@@ -44,7 +46,35 @@ public class BakerStreet42 extends Game {
 	 * 设置地图当前的显示索引
 	 * @param id	地图当前显示到的机关索引
 	 */
-	public void setMapCurrIndex(int id){
+	public void setMapCurrIndex(String id){
+		int i = Integer.getInteger(id,-1);
+		//0:初始.1:星盘.2:乌龟.3:插旗.4:军令.5:守关3处.6:追击.7:守关4处放火.8:铁锁连环.9:草船借箭.10:擂鼓助威.
+		//11:借东风.12:放火.13:选择追击路线
 
+		Array<Vector2> points = new Array<Vector2>();
+		points.add(new Vector2(-100,-100));
+		points.add(new Vector2());
+
+		switch(i){
+			case 0:
+				break;
+			case 1:
+				break;
+			case 2:
+				break;
+			case 3:
+				break;
+			case 4:
+				break;
+			case 5:
+				break;
+			case 6:
+				break;
+			case 7:
+				break;
+			case 8:
+				break;
+
+		}
 	}
 }
