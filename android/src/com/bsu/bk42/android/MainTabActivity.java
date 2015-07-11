@@ -36,7 +36,7 @@ public class MainTabActivity extends TabActivity {
     }
 
     /**
-     * 初始化主界面
+     * 鍒濆鍖栦富鐣岄潰
      */
     private void init(){
         m_tabHost = getTabHost();
@@ -108,7 +108,7 @@ public class MainTabActivity extends TabActivity {
         //地图的状态
         //0:初始.1:星盘.2:乌龟.3:插旗.4:军令.5:守关3处.6:追击.7:守关4处放火.8:铁锁连环.9:草船借箭.10:擂鼓助威.
         //11:借东风.12:放火.13:选择追击路线
-        editor.putInt("map",0);
+        editor.putInt("map", 0);
 
         //星盘完成状态
         editor.putBoolean("stars",false);
