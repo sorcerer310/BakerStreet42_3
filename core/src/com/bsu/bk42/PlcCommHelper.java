@@ -21,7 +21,7 @@ public class PlcCommHelper {
     private ObjectMap<String,String> netcfg = new ObjectMap<String,String>();
     private PlcCommHelper(){
         try{
-            PropertiesUtils.load(netcfg, Gdx.files.internal("net.properties").reader());
+            PropertiesUtils.load(netcfg, Gdx.files.internal("cfg.properties").reader());
         } catch (Exception e) {
             e.printStackTrace();
         }
