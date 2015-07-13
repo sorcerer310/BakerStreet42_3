@@ -86,6 +86,8 @@ public class MainTabActivity extends TabActivity {
             //如果发来的消息为地图
             if(ss[0].equals("map")){
                 m_radioGroup.check(R.id.main_tab_map);
+                //0:初始.1:星盘.2:乌龟.3:插旗.4:军令.5:守关3处完成.6:追击.7:守关4处放火.8:铁锁连环.9:船舱门关 10:草船借箭.11:擂鼓助威.
+                //12:借东风.13:放火.14:选择大路追击.15:选择华容道追击
                 game.setMapCurrIndex(ss[1]);
             }
         }else{

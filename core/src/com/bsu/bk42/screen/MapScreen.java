@@ -33,7 +33,7 @@ public class MapScreen extends UGameScreen {
     private Array<Mark> marks = null;
     private Texture tx_mark = null;
 
-    private Group mapgroup = new Group();                                                                           //加载地图上所有元素的group
+    private Group mapgroup = new Group();                                                                            //加载地图上所有元素的group
     private int cloudsWidth = 8;
     private int cloudsHeight = 11;
     public MapScreen(){
@@ -80,26 +80,18 @@ public class MapScreen extends UGameScreen {
         mapgroup.setBounds(0, 0, tx_map.getWidth(), tx_map.getHeight());
         mapgroup.addActor(map);
         marks = makeMarks(new int[][]{
-                {724, 598},                                          //星盘
-                {587, 883}, {495, 202},                                //乌龟,插旗
-                {284, 156}, {417, 256}, {121, 441}, {134, 889}, {413, 889},  //军令台,4个脚踏
-                {282, 974}, {282, 1335},                               //通道两小门
-                {115, 1652}, {368, 1652},                              //两侧墙壁铁索连环
-                {568, 2036}, {661, 1715}, {683, 1475},                   //船舱门,草船借箭,擂鼓
-                {137, 2118},                                         //借东风
-                {736, 2121},                                         //追击小门
-                {920, 2121}, {825, 1914}                               //大路小门,华容道小门
+                {724, 598},                                                     //星盘
+                {587, 883}, {495, 202},                                         //乌龟,插旗
+                {284, 156}, {417, 256}, {121, 441}, {134, 889}, {413, 889},     //军令台,4个脚踏
+                {282, 974}, {282, 1335},                                        //通道两小门
+                {115, 1652}, {368, 1652},                                       //两侧墙壁铁索连环
+                {568, 2036}, {661, 1715}, {683, 1475},                          //船舱门,草船借箭,擂鼓
+                {137, 2118},                                                    //借东风
+                {736, 2121},                                                    //追击小门
+                {920, 2121}, {825, 1914}                                        //大路小门,华容道小门
         });
         for(Mark m:marks)
             mapgroup.addActor(m);
-
-//        clouds = makeClouds(new int[][]{
-//                {825,889},{725,575},{893,576},{810,376},{772,200},{877,69},               //房间1
-//                {548,889},{589,625},{555,426},{466,176},                                  //茅庐
-//                {230,848},{230,599},{230,329},{230,150},                                  //博望坡
-//                {279,1129},{280,1264},                                                    //通道
-//
-//        });
 
         int[][] cpoints = new int[cloudsWidth*cloudsHeight][2];
         for(int i=0;i<cloudsWidth;i++){
@@ -253,6 +245,113 @@ public class MapScreen extends UGameScreen {
             marks.add(mark);
         }
         return marks;
+    }
+
+    /**
+     * 标记机关完成
+     * @param mi    标记的索引
+     */
+    private void appearMark(int mi){
+        marks.get(mi).setVisible(true);
+    }
+
+    /**
+     * 收到plc命令执行标记闪动\云彩消失操作
+     * @param cmdi  plc命令:0:初始.1:星盘.2:乌龟.3:插旗.4:军令.5:守关3处完成.6:追击.7:守关4处放火.8:铁锁连环.9:船舱门关 10:草船借箭.11:擂鼓助威.
+     *                       12:借东风.13:放火.14:选择大路追击.15:选择华容道追击
+     *
+     *  标记:
+     *  {724, 598},                                                 //0:星盘
+        {587, 883}, {495, 202},                                     //1:乌龟,2:插旗
+        {284, 156}, {417, 256}, {121, 441}, {134, 889}, {413, 889}, //3:军令台,4567:4个脚踏
+        {282, 974}, {282, 1335},                                    //89:通道两小门
+        {115, 1652}, {368, 1652},                                   //10 11:两侧墙壁铁索连环
+        {568, 2036}, {661, 1715}, {683, 1475},                      //12 13 14:船舱门,草船借箭,擂鼓
+        {137, 2118},                                                //15:借东风
+        {736, 2121},                                                //16:追击小门
+        {920, 2121}, {825, 1914}                                    //17 18:大路小门,华容道小门
+        消失云彩:
+        0:房间1消失云彩.1:茅庐消失云彩 2:博望坡消失云彩 3:通道云彩 4:铁锁连环 5:草船借箭
+        6:华容道 7:大路消失云彩
+     */
+    public void plcCommand(int cmdi){
+        switch(cmdi){
+            case 0:             //初始
+                dispareClouds(0);                                                                                       //房间1云彩消失
+                break;
+            case 1:             //完成星盘
+                //星盘完成
+                appearMark(0);
+                //房间2云彩消失
+                dispareClouds(1);
+                break;
+            case 2:             //完成乌龟
+                //乌龟完成
+                appearMark(1);
+                break;
+            case 3:             //完成插旗
+                //插旗完成
+                appearMark(2);
+                //博望坡云彩消失
+                dispareClouds(2);
+                break;
+            case 4:             //拿起军令
+                //军令完成
+                appearMark(3);
+                break;
+            case 5:             //踩上3个脚踏
+                //3个脚踏亮
+                appearMark(4);appearMark(5);appearMark(6);
+                //通道云彩消失
+                dispareClouds(3);
+                break;
+            case 6:             //触发通道人体感应
+                break;
+            case 7:             //第4个脚踏踩亮
+                //第4个脚踏亮
+                appearMark(7);
+                //铁锁连环云彩消失
+                dispareClouds(4);
+                break;
+            case 8:             //铁锁连环挂上
+                //铁锁连环完成亮
+                appearMark(10);appearMark(11);
+                //船舱云消失
+                dispareClouds(5);
+                break;
+            case 9:             //船舱门关上
+                //船舱门关
+                appearMark(12);
+                break;
+            case 10:            //草船借箭完成
+                //草船借箭完成
+                appearMark(13);
+                break;
+            case 11:            //擂鼓成功
+                //擂鼓完成
+                appearMark(14);
+                break;
+            case 12:            //借东风完成
+                //借东风完成
+                appearMark(15);
+                break;
+            case 13:            //手机点火完成
+                break;
+            case 14:            //选择大路追击
+                //选择大路完成
+                appearMark(17);
+                //大路云彩消失
+                dispareClouds(7);
+                break;
+            case 15:             //选择华容道追击
+                //选择华容道完成
+                appearMark(18);
+                //华容道云彩消失
+                dispareClouds(6);
+                break;
+            default:
+                break;
+        }
     }
 
     @Override
