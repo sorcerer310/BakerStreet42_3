@@ -14,6 +14,7 @@ import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.Disposable;
 import com.badlogic.gdx.utils.viewport.StretchViewport;
 import com.bsu.bk42.PlcCommHelper;
+import com.ugame.gdx.tools.ParticlePoolHelper;
 import com.ugame.gdx.tools.UGameScreen;
 import com.ugame.gdx.tween.accessor.ActorAccessor;
 import com.ugame.net.UGameNetInstance;
@@ -28,8 +29,8 @@ public class StarScreen extends UGameScreen {
 
     private Texture tx_star = null;                                                                                  //星星图案的纹理
     private Array<StarImage> currStars = new Array<StarImage>();
-    private Array<Array<StarImage>> all3ScreenStars = new Array<Array<StarImage>>();                                //3屏幕的所有星星
-    private int currScreen = 0;                                                                                     //当前屏幕的索引
+    private Array<Array<StarImage>> all3ScreenStars = new Array<Array<StarImage>>();                                              //3屏幕的所有星星
+    private int currScreen = 0;                                                                                      //当前屏幕的索引
     private int disappearCount = 0;                                                                                 //当前屏幕星星消失的数量
     private Texture tx_starbackground = null;                                                                      //星星背景
     private StarBackgroundImage sbi;                                                                                  //星星背景对象
@@ -38,8 +39,10 @@ public class StarScreen extends UGameScreen {
     private DRAWSTATE state = DRAWSTATE.NOMAL;                                                                       //当前连线状态
     private Vector2 movePoint = new Vector2();
 
-    private Array<Vector2> linePoints = new Array<Vector2>();                                                        //要绘制的所有拐点
+    private Array<Vector2> linePoints = new Array<Vector2>();                                                             //要绘制的所有拐点
     private int lineWidth = 5;                                                                                       //绘制的线段宽度
+
+    private ParticlePoolHelper pph_star = new ParticlePoolHelper("particle/star.p",".");                          //星星粒子
 
     public StarScreen(){
         screenWidth = 720.0f;                                                                                           //设置游戏界面的宽高
@@ -79,19 +82,20 @@ public class StarScreen extends UGameScreen {
         }
 
 
-        stage.addListener(new DragListener(){
+        stage.addListener(new DragListener() {
             @Override
             public boolean touchDown(InputEvent event, float x, float y, int pointer, int button) {
                 //当鼠标点在某个星星范围内设置为绘制的第一个点.
-                for(int i=0;i< currStars.size;i++){
-                    if(currStars.get(i).hit(x- currStars.get(i).getX(),y- currStars.get(i).getY(),true)!=null) {
+                for (int i = 0; i < currStars.size; i++) {
+                    if (currStars.get(i).hit(x - currStars.get(i).getX(), y - currStars.get(i).getY(), true) != null) {
                         linePoints.clear();
                         StarImage si = currStars.get(i);
                         si.setIsSelected(true);                                                                         //设置当前星星为选中
-                        linePoints.add(new Vector2(si.getX()+si.getWidth()/2,si.getY()+si.getHeight()/2));
+                        linePoints.add(new Vector2(si.getX() + si.getWidth() / 2, si.getY() + si.getHeight() / 2));
                     }
                 }
-                System.out.println("x:"+x+" y:"+y);
+                pph_star.playAllEffect(x, y);
+                System.out.println("x:" + x + " y:" + y);
 //                sbi.goRight();
                 return true;
             }
@@ -101,24 +105,29 @@ public class StarScreen extends UGameScreen {
                 super.touchUp(event, x, y, pointer, button);
                 //当抬起鼠标时恢复绘状态
                 state = DRAWSTATE.NOMAL;
-                for(int i=0;i< currStars.size;i++)
+                for (int i = 0; i < currStars.size; i++)
                     currStars.get(i).setIsSelected(false);                                                            //设置所有的星星为未选中
 
                 //判断当前所有连接拐点与顺序一致,如果一致则正确切换到下一屏
                 boolean right = true;
-                if(linePoints.size== currStars.size){
-                    for(int i=0;i<currStars.size;i++)
-                        if(currStars.get(i).hit(linePoints.get(i).x-currStars.get(i).getX()
-                                ,linePoints.get(i).y-currStars.get(i).getY(),true)==null) {
+                if (linePoints.size == currStars.size) {
+                    for (int i = 0; i < currStars.size; i++)
+                        if (currStars.get(i).hit(linePoints.get(i).x - currStars.get(i).getX()
+                                , linePoints.get(i).y - currStars.get(i).getY(), true) == null) {
                             right = false;
                             break;
                         }
-                }else{
+                } else {
                     right = false;
                 }
+
+
+//                System.out.println("time:" + (System.currentTimeMillis() - start));
+//                start = System.currentTimeMillis();
+
                 //如果所有的点都正确,切到下一屏,并设置当前的星星为下一屏幕的星星
-                if(right) {
-                    if(currScreen<2) {
+                if (right) {
+                    if (currScreen < 2) {
                         //当屏幕为前两个屏幕时移动到下个屏幕
                         for (StarImage si : currStars) {                                                                       //先移除当前屏幕的星星
                             si.setOpacityListener(new StarImage.OpacityListener() {
@@ -140,7 +149,7 @@ public class StarScreen extends UGameScreen {
                             si.disappear();
 
                         }
-                    }else{
+                    } else {
                         //当前屏幕为最后一个屏幕时整个星图成功
                         //当屏幕为前两个屏幕时移动到下个屏幕
                         for (StarImage si : currStars) {                                                                       //先移除当前屏幕的星星
@@ -161,17 +170,34 @@ public class StarScreen extends UGameScreen {
                             si.disappear();
                         }
                     }
-                }else{
+                } else {
                     System.out.println("not right");
-                    //如果不正确,熄灭所有的灯
-                    Array<String> paths = new Array<String>();
-                    for(StarImage si:currStars)
-                        paths.add("/plc_send_serial?plccmd=N"+si.getId());
-//                    paths.add("/plc_send_serial?plccmd=NS0");
 
-                    PlcCommHelper.getInstance().simpleGetMoreCmd(paths);
+//                    System.out.println("time:" + (System.currentTimeMillis() - start));
+//                    start = System.currentTimeMillis();
+
+
+                    //如果不正确,熄灭所有的灯
+//                    Array<String> paths = new Array<String>();
+//                    for (StarImage si : currStars)
+//                        paths.add("/plc_send_serial?plccmd=N" + si.getId());
+
+                    String nsparam = "";
+                    if(currScreen==0)
+                        nsparam = "NS0-3";
+                    else if(currScreen==1)
+                        nsparam = "NS4-11";
+                    else if(currScreen == 2)
+                        nsparam = "NS12-21";
+
+                    PlcCommHelper.getInstance().simpleGet("/plc_send_serial?"+nsparam);
+
                 }
                 linePoints.clear();                                                                                   //设置要绘制的拐点为空
+
+
+
+                pph_star.stopEffect();
             }
 
             @Override
@@ -181,16 +207,19 @@ public class StarScreen extends UGameScreen {
                     state = DRAWSTATE.DRAW;                                                                           //切换到绘制状态
                 movePoint.set(event.getStageX(), event.getStageY());                                                  //设置移动时的坐标
                 //判断当前是否经过了其他星,如果经过了其他的则获得下个绘制拐点
-                for(int i=0;i< currStars.size;i++) {
+                for (int i = 0; i < currStars.size; i++) {
                     StarImage si = currStars.get(i);
-                    if (!si.isSelected() && si.hit(x- currStars.get(i).getX(),y- currStars.get(i).getY(),true)!=null) {
+                    if (!si.isSelected() && si.hit(x - currStars.get(i).getX(), y - currStars.get(i).getY(), true) != null) {
                         linePoints.add(new Vector2(si.getX() + si.getWidth() / 2, si.getY() + si.getHeight() / 2));
                         si.setIsSelected(true);
                     }
                 }
+
+                pph_star.moveEffect(x, y);
             }
         });
 
+        stage.addActor(pph_star);                                                                                     //星星粒子加入到stage中
     }
 
     //渲染连线

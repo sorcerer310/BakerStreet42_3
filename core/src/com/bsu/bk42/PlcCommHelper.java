@@ -49,16 +49,23 @@ public class PlcCommHelper {
      * @param path  多个指令的路径
      */
     public void simpleGetMoreCmd(Array<String> path){
+
         for(String p:path){
+//            long start = System.currentTimeMillis();
             Net.HttpRequest request = new Net.HttpRequest(Net.HttpMethods.GET);
-            request.setUrl(netcfg.get("urlpath")+p);
+            request.setUrl(netcfg.get("urlpath") + p);
             Gdx.net.sendHttpRequest(request, new Net.HttpResponseListener() {
                 @Override
-                public void handleHttpResponse(Net.HttpResponse httpResponse) {}
+                public void handleHttpResponse(Net.HttpResponse httpResponse) {
+                }
+
                 @Override
-                public void failed(Throwable t) {}
+                public void failed(Throwable t) {
+                }
+
                 @Override
-                public void cancelled() {}
+                public void cancelled() {
+                }
             });
 
             try {
@@ -66,6 +73,8 @@ public class PlcCommHelper {
             } catch (InterruptedException e) {
                 e.printStackTrace();
             }
+//            System.out.println("time:" + (System.currentTimeMillis() - start));
         }
+
     }
 }
