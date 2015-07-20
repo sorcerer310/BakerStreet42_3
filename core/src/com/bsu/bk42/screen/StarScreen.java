@@ -190,7 +190,8 @@ public class StarScreen extends UGameScreen {
                     else if(currScreen == 2)
                         nsparam = "NS12-21";
 
-                    PlcCommHelper.getInstance().simpleGet("/plc_send_serial?"+nsparam);
+                    System.out.println("++++++++++++++++++++"+"/plc_send_serial?plccmd=" + nsparam);
+                    PlcCommHelper.getInstance().simpleGet("/plc_send_serial?plccmd=" + nsparam);
 
                 }
                 linePoints.clear();                                                                                   //设置要绘制的拐点为空
@@ -282,6 +283,13 @@ public class StarScreen extends UGameScreen {
     public void show() {
         super.show();
         Gdx.input.setInputProcessor(stage);
+    }
+
+    @Override
+    public void dispose() {
+        super.dispose();
+        tx_star.dispose();
+        tx_starbackground.dispose();
     }
 }
 
@@ -507,7 +515,7 @@ class StarImage extends Image implements Disposable {
 /**
  *  星盘的背景图
  */
-class StarBackgroundImage extends Image{
+class StarBackgroundImage extends Image implements Disposable{
     private TweenManager tm = new TweenManager();
 //    private Texture sbg1 = new Texture(Gdx.files.internal("starbackground1.png"));
 //    private Texture sbg2 = new Texture(Gdx.files.internal("starbackground2.png"));
@@ -580,6 +588,11 @@ class StarBackgroundImage extends Image{
 
     public void setMoveListener(MoveListener listener) {
         this.listener = listener;
+    }
+
+    @Override
+    public void dispose() {
+        tm.killAll();
     }
 
     /**

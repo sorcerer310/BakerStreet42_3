@@ -8,6 +8,7 @@ import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.utils.Array;
+import com.bsu.bk42.screen.FireScreen;
 import com.bsu.bk42.screen.MapScreen;
 import com.bsu.bk42.screen.StarScreen;
 
@@ -19,11 +20,13 @@ public class BakerStreet42 extends Game {
 
 	private MapScreen ms = null;																						//地图场景
 	private StarScreen ss = null;																						//星星场景
+	private FireScreen fs = null;
 
 	@Override
 	public void create () {
 		ms = new MapScreen();
 		ss = new StarScreen();
+		fs = new FireScreen();
 		this.setScreen(ss);
 	}
 
