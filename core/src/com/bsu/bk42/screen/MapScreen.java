@@ -65,7 +65,6 @@ public class MapScreen extends UGameScreen {
                         return super.touchDown(event, x, y, pointer, button);
                     }
                 });
-
             }
             @Override
             public void draw(Batch batch, float parentAlpha) {
@@ -73,7 +72,6 @@ public class MapScreen extends UGameScreen {
                 if(tx_map!=null)
                     batch.draw(tx_map, this.getX(), this.getY());
             }
-
         };
 
 //        map = new Image(tx_map);
