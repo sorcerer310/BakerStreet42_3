@@ -3,6 +3,7 @@ package com.bsu.bk42.screen;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.Batch;
+import com.badlogic.gdx.math.MathUtils;
 import com.badlogic.gdx.scenes.scene2d.Group;
 import com.badlogic.gdx.scenes.scene2d.InputEvent;
 import com.badlogic.gdx.scenes.scene2d.InputListener;
@@ -110,6 +111,11 @@ class FirePoint extends Image{
                 if(!isFire) {
                     pph_fire.playAllEffect(FirePoint.this.getX()+FirePoint.this.getWidth()/2
                             , FirePoint.this.getY());
+                    for(int i=0;i<3;i++) {
+                        float rx = FirePoint.this.getX()+FirePoint.this.getWidth()/2+MathUtils.random(-300.0f,300.0f);
+                        float ry = FirePoint.this.getY()+MathUtils.random(-300.0f,300.0f);
+                        pph_fire.playAllEffect(rx,ry);
+                    }
                     isFire = true;
                 }
             }
