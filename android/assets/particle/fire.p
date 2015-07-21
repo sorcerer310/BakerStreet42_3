@@ -2,16 +2,16 @@ fire
 - Delay -
 active: false
 - Duration - 
-lowMin: 3000.0
-lowMax: 3000.0
+lowMin: 5000.0
+lowMax: 5000.0
 - Count - 
 min: 0
 max: 200
 - Emission - 
 lowMin: 0.0
 lowMax: 0.0
-highMin: 250.0
-highMax: 250.0
+highMin: 200.0
+highMax: 200.0
 relative: false
 scalingCount: 1
 scaling0: 1.0
@@ -62,8 +62,8 @@ timeline0: 0.0
 - Scale - 
 lowMin: 0.0
 lowMax: 0.0
-highMin: 32.0
-highMax: 32.0
+highMin: 75.0
+highMax: 75.0
 relative: false
 scalingCount: 1
 scaling0: 1.0
@@ -73,8 +73,8 @@ timeline0: 0.0
 active: true
 lowMin: 0.0
 lowMax: 0.0
-highMin: 30.0
-highMax: 300.0
+highMin: 100.0
+highMax: 500.0
 relative: false
 scalingCount: 1
 scaling0: 1.0
@@ -126,10 +126,10 @@ timeline2: 0.8
 timeline3: 1.0
 - Options - 
 attached: false
-continuous: false
+continuous: true
 aligned: false
 additive: true
 behind: false
 premultipliedAlpha: false
 - Image Path -
-fire.png
+E:\works\Intellij\BakerStreet42_3\android\assets\particle\fire.png

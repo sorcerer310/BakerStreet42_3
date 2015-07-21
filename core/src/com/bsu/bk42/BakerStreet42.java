@@ -27,7 +27,7 @@ public class BakerStreet42 extends Game {
 		ms = new MapScreen();
 		ss = new StarScreen();
 		fs = new FireScreen();
-		this.setScreen(ss);
+		this.setScreen(fs);
 	}
 
 	/**

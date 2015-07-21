@@ -190,14 +190,11 @@ public class StarScreen extends UGameScreen {
                     else if(currScreen == 2)
                         nsparam = "NS12-21";
 
-                    System.out.println("++++++++++++++++++++"+"/plc_send_serial?plccmd=" + nsparam);
+                    System.out.println("+++++++++++++++++"+"/plc_send_serial?plccmd=" + nsparam);
                     PlcCommHelper.getInstance().simpleGet("/plc_send_serial?plccmd=" + nsparam);
 
                 }
                 linePoints.clear();                                                                                   //设置要绘制的拐点为空
-
-
-
                 pph_star.stopEffect();
             }
 
