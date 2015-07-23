@@ -18,16 +18,19 @@ public class BakerStreet42 extends Game {
 	public static final int MAPSCREEN = 0;																			//地图场景的默认索引
 	public static final int STARSCREEN = 1;																		//星星场景的默认索引
 
-	private MapScreen ms = null;																						//地图场景
-	private StarScreen ss = null;																						//星星场景
-	private FireScreen fs = null;
+	public static MapScreen ms = null;																						//地图场景
+	public static StarScreen ss = null;																						//星星场景
+	public static FireScreen fs = null;
 
 	@Override
 	public void create () {
-		ms = new MapScreen();
-		ss = new StarScreen();
-		fs = new FireScreen();
-		this.setScreen(fs);
+		if(ms==null)
+			ms = new MapScreen();
+		if(ss==null)
+			ss = new StarScreen();
+		if(fs==null)
+			fs = new FireScreen();
+		this.setScreen(ms);
 	}
 
 	/**
@@ -52,7 +55,19 @@ public class BakerStreet42 extends Game {
 	public void setMapCurrIndex(String id){
 		//0:初始.1:星盘.2:乌龟.3:插旗.4:军令.5:守关3处完成.6:追击.7:守关4处放火.8:铁锁连环.9:船舱门关 10:草船借箭.11:擂鼓助威.
 		//12:宝剑咒语箱开.13:借东风.14:放火.15:选择大路追击.16:选择华容道追击
-		int i = Integer.getInteger(id,-1);
+		int i = Integer.parseInt(id);
 		ms.plcCommand(i);
+	}
+
+	@Override
+	public void resume() {
+		super.resume();
+		System.out.println("================BakerStreet42 resume");
+	}
+
+	@Override
+	public void render() {
+		super.render();
+//		System.out.println("======================BakerStreet42 render");
 	}
 }

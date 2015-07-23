@@ -42,7 +42,7 @@ public class StarScreen extends UGameScreen {
     private Array<Vector2> linePoints = new Array<Vector2>();                                                             //要绘制的所有拐点
     private int lineWidth = 5;                                                                                       //绘制的线段宽度
 
-    private ParticlePoolHelper pph_star = new ParticlePoolHelper("particle/star.p",".");                          //星星粒子
+    private ParticlePoolHelper pph_star = new ParticlePoolHelper("particle/star.p","particle");                          //星星粒子
 
     public StarScreen(){
         screenWidth = 720.0f;                                                                                           //设置游戏界面的宽高

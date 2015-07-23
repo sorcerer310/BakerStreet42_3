@@ -100,14 +100,14 @@ public class MapScreen extends UGameScreen {
             }
         }
         clouds = makeClouds(cpoints);
-        dispareClouds(0);
-        dispareClouds(1);
-        dispareClouds(2);
-        dispareClouds(3);
-        dispareClouds(4);
-        dispareClouds(5);
+//        dispareClouds(0);
+//        dispareClouds(1);
+//        dispareClouds(2);
+//        dispareClouds(3);
+//        dispareClouds(4);
+//        dispareClouds(5);
 //        dispareClouds(6);
-        dispareClouds(7);
+//        dispareClouds(7);
 
         for(Image c:clouds)
             mapgroup.addActor(c);
@@ -273,9 +273,11 @@ public class MapScreen extends UGameScreen {
         6:华容道 7:大路消失云彩
      */
     public void plcCommand(int cmdi){
+
         switch(cmdi){
             case 0:             //初始
                 dispareClouds(0);                                                                                       //房间1云彩消失
+                System.out.println("==================:" + cmdi);
                 break;
             case 1:             //完成星盘
                 //星盘完成
@@ -362,7 +364,17 @@ public class MapScreen extends UGameScreen {
         Gdx.input.setInputProcessor(stage);
     }
 
+    @Override
+    public void resume() {
+        super.resume();
+        System.out.println("================MapScreen resume");
+    }
 
+    @Override
+    public void render(float delta) {
+        super.render(delta);
+//        System.out.println("======================MapScreen render");
+    }
 }
 
 /**

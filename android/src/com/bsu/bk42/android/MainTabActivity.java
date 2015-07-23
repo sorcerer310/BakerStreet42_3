@@ -28,11 +28,19 @@ public class MainTabActivity extends TabActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.main_tab);
-        game = new BakerStreet42();
+        System.out.println("===================BakerStreet42 create");
+        if(game==null)
+            game = new BakerStreet42();
         game.setScreen(BakerStreet42.MAPSCREEN);
         init();
         initservice();
         initIntent();
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        game.resume();
     }
 
     /**
@@ -89,6 +97,7 @@ public class MainTabActivity extends TabActivity {
                 //0:初始.1:星盘.2:乌龟.3:插旗.4:军令.5:守关3处完成.6:追击.7:守关4处放火.8:铁锁连环.9:船舱门关 10:草船借箭.11:擂鼓助威.
                 //12:宝剑咒语箱开.13:借东风.14:放火.15:选择大路追击.16:选择华容道追击
                 game.setMapCurrIndex(ss[1]);
+//                System.out.println("===============================" + ss[1]);
             }
         }else{
             //如果发来的消息为放火

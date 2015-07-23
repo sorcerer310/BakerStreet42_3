@@ -98,12 +98,13 @@ public class FireScreen extends UGameScreen {
  */
 class FirePoint extends Image{
     private ParticlePoolHelper pph_fire;
+
     private boolean isFire = false;
 
     public FirePoint(final Texture tx){
         super(tx);
 
-        pph_fire = new ParticlePoolHelper("particle/fire.p","./particle");
+        pph_fire = new ParticlePoolHelper("particle/fire.p","particle");
         this.addCaptureListener(new ClickListener(){
             @Override
             public void clicked(InputEvent event, float x, float y) {
@@ -134,6 +135,12 @@ class FirePoint extends Image{
         pph_fire.draw(batch, parentAlpha);
     }
 
+    public boolean isFire() {
+        return isFire;
+    }
+
+
+
     /**
      * 静态方法,用来生成该类的对象
      * @param tx        对象使用的纹理
@@ -146,5 +153,4 @@ class FirePoint extends Image{
         fp.setPosition(x,y);
         return fp;
     }
-
 }
