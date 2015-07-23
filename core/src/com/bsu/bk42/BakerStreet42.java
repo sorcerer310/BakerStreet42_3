@@ -58,16 +58,4 @@ public class BakerStreet42 extends Game {
 		int i = Integer.parseInt(id);
 		ms.plcCommand(i);
 	}
-
-	@Override
-	public void resume() {
-		super.resume();
-		System.out.println("================BakerStreet42 resume");
-	}
-
-	@Override
-	public void render() {
-		super.render();
-//		System.out.println("======================BakerStreet42 render");
-	}
 }

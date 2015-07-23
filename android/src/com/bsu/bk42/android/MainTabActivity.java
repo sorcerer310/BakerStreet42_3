@@ -1,7 +1,9 @@
 package com.bsu.bk42.android;
 
 import android.app.Activity;
+import android.app.ActivityManager;
 import android.app.TabActivity;
+import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
@@ -10,9 +12,12 @@ import android.view.MenuItem;
 import android.widget.RadioButton;
 import android.widget.RadioGroup;
 import android.widget.TabHost;
+import com.badlogic.gdx.Gdx;
 import com.bsu.bk42.BakerStreet42;
 import org.androidpn.client.Constants;
 import org.androidpn.client.ServiceManager;
+
+import java.util.List;
 
 
 public class MainTabActivity extends TabActivity {
@@ -20,7 +25,7 @@ public class MainTabActivity extends TabActivity {
     private SharedPreferences settings;
 
     private TabHost m_tabHost;
-    private RadioGroup m_radioGroup;
+    public static RadioGroup m_radioGroup;
 
     public static BakerStreet42 game= null;                                             //全局game对象，保证在任何activity中都可以调用到。
 
@@ -28,19 +33,42 @@ public class MainTabActivity extends TabActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.main_tab);
-        System.out.println("===================BakerStreet42 create");
-        if(game==null)
-            game = new BakerStreet42();
-        game.setScreen(BakerStreet42.MAPSCREEN);
+
         init();
         initservice();
-        initIntent();
+//        initIntent();
     }
 
     @Override
     protected void onResume() {
         super.onResume();
-        game.resume();
+//        game.resume();
+    }
+
+    @Override
+    protected void onNewIntent(Intent intent) {
+        super.onNewIntent(intent);
+        String urivalue = intent.getStringExtra(Constants.NOTIFICATION_URI);
+        if(urivalue==null)
+            return;
+        if(urivalue.contains(":")){
+            String[] ss  = urivalue.split(":");
+            //如果发来的消息为地图
+            if(ss[0].equals("map")){
+                m_radioGroup.check(R.id.main_tab_map);
+                //0:初始.1:星盘.2:乌龟.3:插旗.4:军令.5:守关3处完成.6:追击.7:守关4处放火.8:铁锁连环.9:船舱门关 10:草船借箭.11:擂鼓助威.
+                //12:宝剑咒语箱开.13:借东风.14:放火.15:选择大路追击.16:选择华容道追击
+                game.setMapCurrIndex(ss[1]);
+//                System.out.println("===============================" + ss[1]);
+            }
+        }else{
+            //如果发来的消息为放火
+            if(urivalue.equals("fire"))
+                m_radioGroup.check(R.id.main_tab_fire);
+                //如果发来的消息为追击
+            else if(urivalue.equals("followup"))
+                m_radioGroup.check(R.id.main_tab_followup);
+        }
     }
 
     /**
@@ -79,6 +107,8 @@ public class MainTabActivity extends TabActivity {
             }
         });
         ((RadioButton) m_radioGroup.getChildAt(0)).toggle();
+
+
     }
 
     /**
@@ -141,4 +171,6 @@ public class MainTabActivity extends TabActivity {
         serviceManager.setNotificationIcon(R.drawable.notification);
         serviceManager.startService();
     }
+
+
 }

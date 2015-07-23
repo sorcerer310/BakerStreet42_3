@@ -16,13 +16,17 @@
 package org.androidpn.client;
 
 
+import android.app.ActivityManager;
 import android.app.KeyguardManager;
 import android.content.BroadcastReceiver;
+import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
 import android.util.Log;
 import com.bsu.bk42.android.MainTabActivity;
 import com.bsu.bk42.android.R;
+
+import java.util.List;
 
 /** 
  * Broadcast receiver that handles push notification messages from the server.
@@ -87,10 +91,8 @@ public final class NotificationReceiver extends BroadcastReceiver {
                 nintent.putExtra(Constants.NOTIFICATION_MESSAGE,notificationMessage);
                 nintent.putExtra(Constants.NOTIFICATION_URI,notificationUri);
                 nintent.putExtra(Constants.NOTIFICATION_FROM, notificationFrom);
-                nintent.putExtra(Constants.PACKET_ID,packetId);
-                nintent.addFlags(Intent.FLAG_ACTIVITY_REORDER_TO_FRONT);
+                nintent.putExtra(Constants.PACKET_ID, packetId);
                 nintent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-
 
                 context.startActivity(nintent);
             }
@@ -131,7 +133,16 @@ public final class NotificationReceiver extends BroadcastReceiver {
     	android.app.KeyguardManager mKeyguardManager = (KeyguardManager) c.getSystemService(c.KEYGUARD_SERVICE);  
     	return mKeyguardManager.inKeyguardRestrictedInputMode();  
 
-    } 
-
-
+    }
+    public final static boolean isAppForground(Context mContext) {
+        ActivityManager am = (ActivityManager) mContext.getSystemService(Context.ACTIVITY_SERVICE);
+        List<ActivityManager.RunningTaskInfo> tasks = am.getRunningTasks(1);
+        if (!tasks.isEmpty()) {
+            ComponentName topActivity = tasks.get(0).topActivity;
+            if (!topActivity.getPackageName().equals(mContext.getPackageName())) {
+                return false;
+            }
+        }
+        return true;
+    }
 }
