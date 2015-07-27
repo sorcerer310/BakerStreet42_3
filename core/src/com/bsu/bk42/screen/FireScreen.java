@@ -37,6 +37,8 @@ public class FireScreen extends UGameScreen {
         scaleWidth = Gdx.graphics.getWidth()/screenWidth;                                                               //获得游戏界面与设备间的比例
         scaleHeight = Gdx.graphics.getHeight()/screenHeight;
 
+        this.setFPS(40.0f);
+
         initGroup();
         initScrollPane();
     }

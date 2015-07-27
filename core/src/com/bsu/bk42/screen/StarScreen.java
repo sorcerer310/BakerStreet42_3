@@ -51,6 +51,8 @@ public class StarScreen extends UGameScreen {
         scaleWidth = Gdx.graphics.getWidth()/screenWidth;                                                               //获得游戏界面与设备间的比例
         scaleHeight = Gdx.graphics.getHeight()/screenHeight;
 
+        this.setFPS(40.0f);
+
         //初始化背景
         tx_starbackground = new Texture(Gdx.files.internal("starbackground.png"));
         sbi = new StarBackgroundImage(tx_starbackground){

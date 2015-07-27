@@ -1,8 +1,6 @@
 package com.bsu.bk42.screen;
 
-import aurelienribon.tweenengine.Timeline;
-import aurelienribon.tweenengine.Tween;
-import aurelienribon.tweenengine.TweenEquations;
+import aurelienribon.tweenengine.*;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.InputAdapter;
 import com.badlogic.gdx.graphics.Texture;
@@ -27,7 +25,7 @@ public class MapScreen extends UGameScreen {
     private Actor map = null;                                                                                        //承载地图的actor
     private ScrollPane sp = null;
 
-    private Array<Image> clouds = null;                                                                              //保存所有的遮挡迷雾
+    private Array<Cloud> clouds = null;                                                                              //保存所有的遮挡迷雾
     private Texture[] tx_clouds = null;
 
     private Array<Mark> marks = null;
@@ -38,11 +36,29 @@ public class MapScreen extends UGameScreen {
     private int cloudsHeight = 11;
     public MapScreen(){
         stage = new Stage(new StretchViewport(700.0F, 1280.0f));
-
+        this.setFPS(40.0f);
         //初始化地图元素组
         initMapGroup();
         //初始化滚动控件
         initScrollPane();
+
+//        plcCommand(0);
+//        plcCommand(1);
+//        plcCommand(2);
+//        plcCommand(3);
+//        plcCommand(4);
+//        plcCommand(5);
+//        plcCommand(6);
+//        plcCommand(7);
+//        plcCommand(8);
+//        plcCommand(9);
+//        plcCommand(10);
+//        plcCommand(11);
+//        plcCommand(12);
+//        plcCommand(13);
+//        plcCommand(14);
+//        plcCommand(15);
+//        plcCommand(16);
     }
 
 
@@ -78,8 +94,8 @@ public class MapScreen extends UGameScreen {
         mapgroup.setBounds(0, 0, tx_map.getWidth(), tx_map.getHeight());
         mapgroup.addActor(map);
         marks = makeMarks(new int[][]{
-                {724, 598},                                                     //星盘
-                {587, 883}, {495, 202},                                         //乌龟,插旗
+                {764, 598},                                                     //星盘
+                {620, 883}, {525, 202},                                         //乌龟,插旗
                 {284, 156}, {417, 256}, {121, 441}, {134, 889}, {413, 889},     //军令台,4个脚踏
                 {282, 974}, {282, 1335},                                        //通道两小门
                 {115, 1652}, {368, 1652},                                       //两侧墙壁铁索连环
@@ -122,7 +138,7 @@ public class MapScreen extends UGameScreen {
         sp.setWidget(mapgroup);
         sp.invalidate();
         sp.validate();
-        sp.setScrollPercentX(.6f);
+        sp.setScrollPercentX(.7f);
         sp.setScrollPercentY(1.0f);
         stage.addActor(sp);
     }
@@ -130,15 +146,15 @@ public class MapScreen extends UGameScreen {
     /**
      * 设置迷雾云彩
      */
-    public Array<Image> makeClouds(int[][] points){
+    public Array<Cloud> makeClouds(int[][] points){
         tx_clouds = new Texture[]{new Texture(Gdx.files.internal("clouds/cloud1.png"))
                 ,new Texture(Gdx.files.internal("clouds/cloud2.png"))
                 ,new Texture(Gdx.files.internal("clouds/cloud3.png"))
         };
-        Array<Image> clouds = new Array<Image>();
+        Array<Cloud> clouds = new Array<Cloud>();
         for(int i=0;i<points.length;i++) {
             Texture tx_cloud = tx_clouds[MathUtils.random(0,2)];
-            Image cloud = new Image(tx_cloud);
+            Cloud cloud = new Cloud(tx_cloud);
             cloud.setOrigin(cloud.getWidth() / 2, cloud.getHeight() / 2);
             cloud.setScale(MathUtils.random(1.2f, 1.2f));
 //            cloud.setColor(cloud.getColor().r, cloud.getColor().g, cloud.getColor().b,0.5f);
@@ -202,14 +218,10 @@ public class MapScreen extends UGameScreen {
 
                 };
                 break;
-            //华容道
+            //华容道前小路
             case 6:
                 di = new int[]{
-                        5+6*cloudsWidth,6+6*cloudsWidth,
-                        5+7*cloudsWidth,6+7*cloudsWidth,
-                        5+8*cloudsWidth,6+8*cloudsWidth,
-                        5+9*cloudsWidth,6+9*cloudsWidth,
-                        5+10*cloudsWidth
+                        5+10*cloudsWidth,6+10*cloudsWidth
                 };
                 break;
             //大路
@@ -223,9 +235,21 @@ public class MapScreen extends UGameScreen {
                         5+10*cloudsWidth
                 };
                 break;
+            //华容道
+            case 8:
+                di = new int[]{
+                        5+6*cloudsWidth,6+6*cloudsWidth,
+                        5+7*cloudsWidth,6+7*cloudsWidth,
+                        5+8*cloudsWidth,6+8*cloudsWidth,
+                        5+9*cloudsWidth,6+9*cloudsWidth,
+                        5+10*cloudsWidth
+                };
+                break;
         }
+        //消失动画
         for(int i=0;i<di.length;i++)
-            clouds.get(di[i]).setVisible(false);
+            clouds.get(di[i]).dispare();
+
     }
 
     /**
@@ -239,7 +263,7 @@ public class MapScreen extends UGameScreen {
         for(int i=0;i<points.length;i++){
             Mark mark = new Mark(tx_mark);
             mark.setPosition(points[i][0]-tx_mark.getWidth()/2, points[i][1]);
-//            mark.setVisible(false);
+            mark.setVisible(false);
             marks.add(mark);
         }
         return marks;
@@ -251,6 +275,7 @@ public class MapScreen extends UGameScreen {
      */
     private void appearMark(int mi){
         marks.get(mi).setVisible(true);
+        marks.get(mi).jump();
     }
 
     /**
@@ -259,15 +284,15 @@ public class MapScreen extends UGameScreen {
      *                       12:借东风.13:放火.14:选择大路追击.15:选择华容道追击
      *
      *  标记:
-     *  {724, 598},                                                 //0:星盘
-        {587, 883}, {495, 202},                                     //1:乌龟,2:插旗
-        {284, 156}, {417, 256}, {121, 441}, {134, 889}, {413, 889}, //3:军令台,4567:4个脚踏
-        {282, 974}, {282, 1335},                                    //89:通道两小门
-        {115, 1652}, {368, 1652},                                   //10 11:两侧墙壁铁索连环
-        {568, 2036}, {661, 1715}, {683, 1475},                      //12 13 14:船舱门,草船借箭,擂鼓
-        {135,2120},{200, 2120},                                     //15:宝剑咒语箱子.16:借东风
-        {736, 2121},                                                //17:追击小门
-        {920, 2121}, {825, 1914}                                    //18 19:大路小门,华容道小门
+     *  {764, 598},                                                     //星盘
+        {620, 883}, {525, 202},                                         //乌龟,插旗
+        {284, 156}, {417, 256}, {121, 441}, {134, 889}, {413, 889},     //军令台,4个脚踏
+        {282, 974}, {282, 1335},                                        //通道两小门
+        {115, 1652}, {368, 1652},                                       //两侧墙壁铁索连环
+        {568, 2036}, {661, 1715}, {683, 1475},                          //船舱门,草船借箭,擂鼓
+        {135,2120},{200, 2120},                                         //宝剑咒语箱子,借东风
+        {736, 2121},                                                    //追击小门
+        {920, 2121}, {825, 1914}                                        //大路小门,华容道小门
         消失云彩:
         0:房间1消失云彩.1:茅庐消失云彩 2:博望坡消失云彩 3:通道云彩 4:铁锁连环 5:草船借箭
         6:华容道 7:大路消失云彩
@@ -277,6 +302,7 @@ public class MapScreen extends UGameScreen {
         switch(cmdi){
             case 0:             //初始
                 dispareClouds(0);                                                                                       //房间1云彩消失
+//                moveMap();
                 System.out.println("==================:" + cmdi);
                 break;
             case 1:             //完成星盘
@@ -284,26 +310,36 @@ public class MapScreen extends UGameScreen {
                 appearMark(0);
                 //房间2云彩消失
                 dispareClouds(1);
+                //移动地图焦点
+                moveMap(.55f,1.0f);
                 break;
             case 2:             //完成乌龟
                 //乌龟完成
                 appearMark(1);
+                //移动地图焦点
+                moveMap(.3f,.6f);
                 break;
             case 3:             //完成插旗
                 //插旗完成
                 appearMark(2);
                 //博望坡云彩消失
                 dispareClouds(2);
+                //移动地图焦点
+                moveMap(.2f,1.0f);
                 break;
             case 4:             //拿起军令
                 //军令完成
                 appearMark(3);
+                //移动地图焦点
+                moveMap(.0f,1.0f);
                 break;
             case 5:             //踩上3个脚踏
                 //3个脚踏亮
                 appearMark(4);appearMark(5);appearMark(6);
                 //通道云彩消失
                 dispareClouds(3);
+                //移动地图焦点
+                moveMap(.0f,1.0f);
                 break;
             case 6:             //触发通道人体感应
                 break;
@@ -312,50 +348,79 @@ public class MapScreen extends UGameScreen {
                 appearMark(7);
                 //铁锁连环云彩消失
                 dispareClouds(4);
+                //移动地图焦点
+                moveMap(.1f,.7f);
                 break;
             case 8:             //铁锁连环挂上
                 //铁锁连环完成亮
                 appearMark(10);appearMark(11);
                 //船舱云消失
                 dispareClouds(5);
+                //移动焦点
+                moveMap(.0f,.1f);
                 break;
             case 9:             //船舱门关上
                 //船舱门关
                 appearMark(12);
+                //移动焦点
+                moveMap(.3f,.0f);
                 break;
             case 10:            //草船借箭完成
                 //草船借箭完成
                 appearMark(13);
+                //移动焦点
+                moveMap(.45f, .0f);
                 break;
             case 11:            //擂鼓成功
                 //擂鼓完成
                 appearMark(14);
+                moveMap(.45f,.3f);
                 break;
             case 12:
                 //宝剑咒语箱子开
                 appearMark(15);
+                moveMap(.0f,.0f);
                 break;
             case 13:            //借东风完成
                 //借东风完成
                 appearMark(16);
+                moveMap(.0f,.0f);
                 break;
-            case 14:            //手机点火完成
+            case 14:            //手机点火完成,华容道前开
+                //华容道前小门开
+                appearMark(18);
+                //华容道前云彩消失
+                dispareClouds(6);
+                //移动地图焦点
+                moveMap(.8f,.0f);
                 break;
             case 15:            //选择大路追击
                 //选择大路完成
                 appearMark(18);
                 //大路云彩消失
                 dispareClouds(7);
+                //移动地图焦点
+                moveMap(.8f,.0f);
                 break;
             case 16:             //选择华容道追击
                 //选择华容道完成
                 appearMark(19);
                 //华容道云彩消失
-                dispareClouds(6);
+                dispareClouds(8);
                 break;
             default:
                 break;
         }
+    }
+
+    /**
+     * 移动整个地图
+     * @param x     移动的百分比
+     * @param y     移动的百分比
+     */
+    private void moveMap(float x,float y){
+        sp.setScrollPercentX(x);
+        sp.setScrollPercentY(y);
     }
 
     @Override
@@ -374,6 +439,42 @@ public class MapScreen extends UGameScreen {
     public void render(float delta) {
         super.render(delta);
 //        System.out.println("======================MapScreen render");
+    }
+}
+
+/**
+ * 地图上的云彩
+ */
+class Cloud extends Image{
+    private TweenManager tm = new TweenManager();
+    public Cloud(Texture t){
+        super(t);
+        Tween.registerAccessor(this.getClass(),new ActorAccessor());
+    }
+
+    /**
+     * 云彩消失动画,播放完动画最后设置云彩visible为false
+     */
+    public void dispare(){
+        Timeline.createParallel()
+                .push(Tween.to(this, ActorAccessor.POS_XY, 1.0f).target(this.getX() + MathUtils.random(-100.0f,100.0f),this.getY()))
+                .push(Tween.to(this,ActorAccessor.OPACITY,1.0f).target(.0f))
+                .push(Tween.to(this,ActorAccessor.SCALE_XY,1.0f).target(1.5f,1.5f))
+                .push(Tween.call(new TweenCallback() {
+                    @Override
+                    public void onEvent(int type, BaseTween<?> source) {
+                        if(type==TweenCallback.COMPLETE){
+                            Cloud.this.setVisible(false);
+                        }
+                    }
+                }))
+                .start(tm);
+    }
+
+    @Override
+    public void act(float delta) {
+        super.act(delta);
+        tm.update(delta);
     }
 }
 
