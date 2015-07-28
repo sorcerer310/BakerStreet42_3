@@ -6,11 +6,11 @@ import android.os.Bundle;
 
 public class Constant {
 
-	public static String mTextviewArray[] = {"AndroidLauncher", "AndroidLauncher", "Activity3", "Activity4"};
+	public static String mTextviewArray[] = {"AndroidLauncher", "AndroidLauncher", "AndroidLauncher", "Activity4"};
 	
 	public static Class mTabClassArray[]= {AndroidLauncher.class,
 		AndroidLauncher.class,
-		Activity3.class,
+		AndroidLauncher.class,
 		Activity4.class};
 
 	/**

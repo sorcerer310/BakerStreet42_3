@@ -61,12 +61,15 @@ public class MainTabActivity extends TabActivity {
                 game.setMapCurrIndex(ss[1]);
 //                System.out.println("===============================" + ss[1]);
             }
-        }else{
             //如果发来的消息为放火
-            if(urivalue.equals("fire"))
+            else if(ss[0].equals("fire")) {
                 m_radioGroup.check(R.id.main_tab_fire);
-                //如果发来的消息为追击
-            else if(urivalue.equals("followup"))
+                game.setFireCurrIndex(ss[1]);
+            }
+
+        }else{
+            //如果发来的消息为追击
+            if(urivalue.equals("followup"))
                 m_radioGroup.check(R.id.main_tab_followup);
         }
     }
@@ -99,6 +102,7 @@ public class MainTabActivity extends TabActivity {
                         break;
                     case R.id.main_tab_fire:
                         m_tabHost.setCurrentTabByTag(Constant.mTextviewArray[2]);
+                        MainTabActivity.game.setScreen(BakerStreet42.FIRESCREEN);           //设置当前为放火界面
                         break;
                     case R.id.main_tab_followup:
                         m_tabHost.setCurrentTabByTag(Constant.mTextviewArray[3]);

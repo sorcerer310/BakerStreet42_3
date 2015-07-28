@@ -22,14 +22,20 @@ import com.ugame.gdx.tools.UGameScreen;
 public class FireScreen extends UGameScreen {
     public static float screenWidth,screenHeight,scaleWidth,scaleHeight;
 
+    //博望坡纹理与图片
     private Texture tx_bowang;
     private Image bg_bowang;
+    //铁锁连环纹理与图片
+    private Texture tx_tiesuo;
+    private Image bg_tiesuo;
 
     private Texture tx_firepoint;
 
     private ParticlePoolHelper pph_fire;
     private ScrollPane sp;
     private Group group = new Group();
+
+    private Image background = null;
     public FireScreen(){
         screenWidth = 720.0f;                                                                                           //设置游戏界面的宽高
         screenHeight = 1280.0f;
@@ -60,21 +66,37 @@ public class FireScreen extends UGameScreen {
                 });
             }
         };
+
+        tx_tiesuo = new Texture("fire/firepoint.png");
+        bg_tiesuo = new Image(tx_tiesuo){
+            {
+                this.addCaptureListener((new InputListener(){
+                    @Override
+                    public boolean touchDown(InputEvent event, float x, float y, int pointer, int button) {
+                        System.out.println("x:"+x+"   y:"+y);
+                        return super.touchDown(event, x, y, pointer, button);
+                    }
+                }));
+            }
+        };
+
+        background = bg_bowang;                                                                                      //默认设置博望坡背景
+
         float v = (float)((float)screenHeight/(int)tx_bowang.getWidth());
 //        bg_bowang.setScaleX(v);
 //        bg_bowang.setRotation(-90.0f);
 //        bg_bowang.setPosition(0, screenHeight);
         group.setBounds(0,0,tx_bowang.getWidth(),tx_bowang.getHeight());
-        group.addActor(bg_bowang);
+        group.addActor(background);
 
 
         //初始化着火点
         tx_firepoint = new Texture("fire/firepoint.png");
 
         group.addActor(FirePoint.makeFirePoint(tx_firepoint,554,468));
-        group.addActor(FirePoint.makeFirePoint(tx_firepoint,1049,582));
-        group.addActor(FirePoint.makeFirePoint(tx_firepoint,1893,609));
-        group.addActor(FirePoint.makeFirePoint(tx_firepoint,2509,420));
+        group.addActor(FirePoint.makeFirePoint(tx_firepoint, 1049, 582));
+        group.addActor(FirePoint.makeFirePoint(tx_firepoint, 1893, 609));
+        group.addActor(FirePoint.makeFirePoint(tx_firepoint, 2509, 420));
 
     }
 
@@ -86,6 +108,24 @@ public class FireScreen extends UGameScreen {
         sp.setBounds(0,0,screenWidth,screenHeight);
         sp.setWidget(group);
         stage.addActor(sp);
+    }
+
+    /**
+     * 获得androidpn发过来的命令,当为0时显示博望坡背景,当为1时显示铁锁连环背景
+     * @param cmdi
+     */
+    public void plcCommand(int cmdi) {
+        System.out.println("========cmdi:"+cmdi);
+        switch (cmdi) {
+            case 0:             //博网坡背景
+                background = bg_bowang;
+                break;
+            case 1:             //铁锁连环背景
+                background = bg_tiesuo;
+                break;
+            default:
+                break;
+        }
     }
 
     @Override

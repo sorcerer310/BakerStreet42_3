@@ -17,10 +17,11 @@ public class BakerStreet42 extends Game {
 //	Texture img;
 	public static final int MAPSCREEN = 0;																			//地图场景的默认索引
 	public static final int STARSCREEN = 1;																		//星星场景的默认索引
+	public static final int FIRESCREEN = 2;																		//放火场景的默认索引
 
-	public static MapScreen ms = null;																						//地图场景
-	public static StarScreen ss = null;																						//星星场景
-	public static FireScreen fs = null;
+	public static MapScreen ms = null;																				//地图场景
+	public static StarScreen ss = null;																				//星星场景
+	public static FireScreen fs = null;																				//放火场景
 
 	@Override
 	public void create () {
@@ -30,7 +31,7 @@ public class BakerStreet42 extends Game {
 			ss = new StarScreen();
 		if(fs==null)
 			fs = new FireScreen();
-		this.setScreen(ms);
+		this.setScreen(fs);
 	}
 
 	/**
@@ -45,6 +46,9 @@ public class BakerStreet42 extends Game {
 			case STARSCREEN:
 				this.setScreen(ss);
 				break;
+			case FIRESCREEN:
+				this.setScreen(fs);
+				break;
 		}
 	}
 
@@ -57,5 +61,15 @@ public class BakerStreet42 extends Game {
 		//12:宝剑咒语箱开.13:借东风.14:放火.15:选择大路追击.16:选择华容道追击
 		int i = Integer.parseInt(id);
 		ms.plcCommand(i);
+	}
+
+	/**
+	 * 设置当前放火界面为哪个界面
+	 * @param id	1为博望坡,2为铁锁连环
+	 */
+	public void setFireCurrIndex(String id){
+		//0:博望坡,1:铁锁连环
+		int i = Integer.parseInt(id);
+		fs.plcCommand(i);
 	}
 }
