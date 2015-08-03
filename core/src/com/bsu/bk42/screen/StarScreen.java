@@ -35,7 +35,7 @@ public class StarScreen extends UGameScreen {
     private Texture tx_starbackground = null;                                                                      //星星背景
     private StarBackgroundImage sbi;                                                                                  //星星背景对象
 
-    private enum DRAWSTATE {NOMAL,DRAW};                                                                             //连线的绘制状态
+    private enum DRAWSTATE {NOMAL,DRAW,END};                                                                             //连线的绘制状态
     private DRAWSTATE state = DRAWSTATE.NOMAL;                                                                       //当前连线状态
     private Vector2 movePoint = new Vector2();
 
@@ -87,6 +87,8 @@ public class StarScreen extends UGameScreen {
         stage.addListener(new DragListener() {
             @Override
             public boolean touchDown(InputEvent event, float x, float y, int pointer, int button) {
+                if(state == DRAWSTATE.END)
+                    return true;
                 //当鼠标点在某个星星范围内设置为绘制的第一个点.
                 for (int i = 0; i < currStars.size; i++) {
                     if (currStars.get(i).hit(x - currStars.get(i).getX(), y - currStars.get(i).getY(), true) != null) {
@@ -105,6 +107,8 @@ public class StarScreen extends UGameScreen {
             @Override
             public void touchUp(InputEvent event, float x, float y, int pointer, int button) {
                 super.touchUp(event, x, y, pointer, button);
+                if(state==DRAWSTATE.END)
+                    return;
                 //当抬起鼠标时恢复绘状态
                 state = DRAWSTATE.NOMAL;
                 for (int i = 0; i < currStars.size; i++)
@@ -153,7 +157,6 @@ public class StarScreen extends UGameScreen {
                         }
                     } else {
                         //当前屏幕为最后一个屏幕时整个星图成功
-                        //当屏幕为前两个屏幕时移动到下个屏幕
                         for (StarImage si : currStars) {                                                                       //先移除当前屏幕的星星
                             si.setOpacityListener(new StarImage.OpacityListener() {
                                 @Override
@@ -170,6 +173,7 @@ public class StarScreen extends UGameScreen {
                                 }
                             });
                             si.disappear();
+                            state = DRAWSTATE.END;                                                                      //将状态设置为绘制结束
                         }
                     }
                 } else {
@@ -203,6 +207,8 @@ public class StarScreen extends UGameScreen {
             @Override
             public void touchDragged(InputEvent event, float x, float y, int pointer) {
                 super.touchDragged(event, x, y, pointer);
+                if(state==DRAWSTATE.END)
+                    return;
                 if (state == DRAWSTATE.NOMAL)
                     state = DRAWSTATE.DRAW;                                                                           //切换到绘制状态
                 movePoint.set(event.getStageX(), event.getStageY());                                                  //设置移动时的坐标
