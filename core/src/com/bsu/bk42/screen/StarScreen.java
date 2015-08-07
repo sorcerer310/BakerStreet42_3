@@ -176,27 +176,30 @@ public class StarScreen extends UGameScreen {
                             state = DRAWSTATE.END;                                                                      //将状态设置为绘制结束
                         }
                     }
+
+                    String sparam = "";                                                                                 //星盘一段亮起参数
+                    if(currScreen==0)
+                        sparam = "S0-2";
+                    else if(currScreen==1)
+                        sparam = "S3-10";
+                    else if(currScreen == 2)
+                        sparam = "S11-21";
+
+                    System.out.println("++++++++right+++++++++"+"/plc_send_serial?plccmd=" + sparam);
+                    PlcCommHelper.getInstance().simpleGet("/plc_send_serial?plccmd=" + sparam);
+
                 } else {
                     System.out.println("not right");
 
-//                    System.out.println("time:" + (System.currentTimeMillis() - start));
-//                    start = System.currentTimeMillis();
-
-
-                    //如果不正确,熄灭所有的灯
-//                    Array<String> paths = new Array<String>();
-//                    for (StarImage si : currStars)
-//                        paths.add("/plc_send_serial?plccmd=N" + si.getId());
-
                     String nsparam = "";
                     if(currScreen==0)
-                        nsparam = "NS0-3";
+                        nsparam = "NS0-2";
                     else if(currScreen==1)
-                        nsparam = "NS4-11";
+                        nsparam = "NS3-10";
                     else if(currScreen == 2)
-                        nsparam = "NS12-21";
+                        nsparam = "NS11-21";
 
-                    System.out.println("+++++++++++++++++"+"/plc_send_serial?plccmd=" + nsparam);
+                    System.out.println("++++++++not right+++++++++"+"/plc_send_serial?plccmd=" + nsparam);
                     PlcCommHelper.getInstance().simpleGet("/plc_send_serial?plccmd=" + nsparam);
 
                 }
