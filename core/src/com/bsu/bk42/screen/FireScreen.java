@@ -22,14 +22,22 @@ import com.ugame.gdx.tools.UGameScreen;
 public class FireScreen extends UGameScreen {
     public static float screenWidth,screenHeight,scaleWidth,scaleHeight;
 
+    //博望坡纹理与图片
     private Texture tx_bowang;
     private Image bg_bowang;
+    //铁锁连环纹理与图片
+    private Texture tx_tiesuo;
+    private Image bg_tiesuo;
 
     private Texture tx_firepoint;
 
     private ParticlePoolHelper pph_fire;
     private ScrollPane sp;
-    private Group group = new Group();
+    private Group bw_group = new Group();                                                                           //博望坡组
+    private Group ts_group = new Group();                                                                           //铁锁连环组
+    private Group sp_group = new Group();                                                                           //加入scrollpane组件的组
+
+    private Image background = null;
     public FireScreen(){
         screenWidth = 720.0f;                                                                                           //设置游戏界面的宽高
         screenHeight = 1280.0f;
@@ -60,21 +68,45 @@ public class FireScreen extends UGameScreen {
                 });
             }
         };
-        float v = (float)((float)screenHeight/(int)tx_bowang.getWidth());
-//        bg_bowang.setScaleX(v);
-//        bg_bowang.setRotation(-90.0f);
-//        bg_bowang.setPosition(0, screenHeight);
-        group.setBounds(0,0,tx_bowang.getWidth(),tx_bowang.getHeight());
-        group.addActor(bg_bowang);
 
+        tx_tiesuo = new Texture("fire/tiesuo.jpg");
+        bg_tiesuo = new Image(tx_tiesuo){
+            {
+                this.addCaptureListener((new InputListener(){
+                    @Override
+                    public boolean touchDown(InputEvent event, float x, float y, int pointer, int button) {
+                        System.out.println("x:"+x+"   y:"+y);
+                        return super.touchDown(event, x, y, pointer, button);
+                    }
+                }));
+            }
+        };
 
-        //初始化着火点
+        //博望坡组设置
+        bw_group.setBounds(0,0,tx_bowang.getWidth(),tx_bowang.getHeight());
+        bw_group.addActor(bg_bowang);
+        //初始化博望坡着火点
         tx_firepoint = new Texture("fire/firepoint.png");
 
-        group.addActor(FirePoint.makeFirePoint(tx_firepoint,554,468));
-        group.addActor(FirePoint.makeFirePoint(tx_firepoint,1049,582));
-        group.addActor(FirePoint.makeFirePoint(tx_firepoint,1893,609));
-        group.addActor(FirePoint.makeFirePoint(tx_firepoint,2509,420));
+        bw_group.addActor(FirePoint.makeFirePoint(tx_firepoint, 554, 468));
+        bw_group.addActor(FirePoint.makeFirePoint(tx_firepoint, 1049, 582));
+        bw_group.addActor(FirePoint.makeFirePoint(tx_firepoint, 1893, 609));
+        bw_group.addActor(FirePoint.makeFirePoint(tx_firepoint, 2509, 420));
+
+        //铁锁连环组设置
+        ts_group.setBounds(0, 0, tx_tiesuo.getWidth(), tx_tiesuo.getHeight());
+        ts_group.addActor(bg_tiesuo);
+        //初始化铁锁连环着火点
+        tx_firepoint = new Texture("fire/firepoint.png");
+
+        ts_group.addActor(FirePoint.makeFirePoint(tx_firepoint, 554, 468));
+        ts_group.addActor(FirePoint.makeFirePoint(tx_firepoint, 1049, 582));
+        ts_group.addActor(FirePoint.makeFirePoint(tx_firepoint, 1893, 609));
+        ts_group.addActor(FirePoint.makeFirePoint(tx_firepoint, 2509, 420));
+
+        //默认设置博望坡的组
+        sp_group.setBounds(0,0,bw_group.getWidth(),bw_group.getHeight());
+        sp_group.addActor(bw_group);
 
     }
 
@@ -82,10 +114,32 @@ public class FireScreen extends UGameScreen {
      * 初始化滚动控件
      */
     private void initScrollPane(){
-        sp = new ScrollPane(group,new ScrollPane.ScrollPaneStyle());
+        sp = new ScrollPane(sp_group,new ScrollPane.ScrollPaneStyle());
         sp.setBounds(0,0,screenWidth,screenHeight);
-        sp.setWidget(group);
+        sp.setWidget(sp_group);
         stage.addActor(sp);
+    }
+
+    /**
+     * 获得androidpn发过来的命令,当为0时显示博望坡背景,当为1时显示铁锁连环背景
+     * @param cmdi
+     */
+    public void plcCommand(int cmdi) {
+        System.out.println("========cmdi:"+cmdi);
+        switch (cmdi) {
+            case 0:             //博网坡背景
+                sp_group.removeActor(ts_group);
+                background = bg_bowang;
+                sp_group.addActor(bw_group);
+                break;
+            case 1:             //铁锁连环背景
+                sp_group.removeActor(bw_group);
+                background = bg_tiesuo;
+                sp_group.addActor(ts_group);
+                break;
+            default:
+                break;
+        }
     }
 
     @Override
