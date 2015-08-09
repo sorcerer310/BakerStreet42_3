@@ -11,9 +11,13 @@ import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.scenes.scene2d.ui.Image;
 import com.badlogic.gdx.scenes.scene2d.ui.ScrollPane;
 import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
+import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.viewport.StretchViewport;
+import com.bsu.bk42.PlcCommHelper;
 import com.ugame.gdx.tools.ParticlePoolHelper;
 import com.ugame.gdx.tools.UGameScreen;
+
+import java.util.Iterator;
 
 /**
  * 点火界面,分为博望坡和铁锁连环两个场景
@@ -38,6 +42,10 @@ public class FireScreen extends UGameScreen {
     private Group sp_group = new Group();                                                                           //加入scrollpane组件的组
 
     private Image background = null;
+
+    private Array<FirePoint> bw_fparray = new Array<FirePoint>();                                                    //拨望坡所有点火点.
+    private Array<FirePoint> ts_fparray = new Array<FirePoint>();                                                    //铁锁连环所有点火点
+
     public FireScreen(){
         screenWidth = 720.0f;                                                                                           //设置游戏界面的宽高
         screenHeight = 1280.0f;
@@ -83,15 +91,11 @@ public class FireScreen extends UGameScreen {
         };
 
         //博望坡组设置
-        bw_group.setBounds(0,0,tx_bowang.getWidth(),tx_bowang.getHeight());
+        bw_group.setBounds(0, 0, tx_bowang.getWidth(), tx_bowang.getHeight());
         bw_group.addActor(bg_bowang);
         //初始化博望坡着火点
         tx_firepoint = new Texture("fire/firepoint.png");
 
-        bw_group.addActor(FirePoint.makeFirePoint(tx_firepoint, 554, 468));
-        bw_group.addActor(FirePoint.makeFirePoint(tx_firepoint, 1049, 582));
-        bw_group.addActor(FirePoint.makeFirePoint(tx_firepoint, 1893, 609));
-        bw_group.addActor(FirePoint.makeFirePoint(tx_firepoint, 2509, 420));
 
         //铁锁连环组设置
         ts_group.setBounds(0, 0, tx_tiesuo.getWidth(), tx_tiesuo.getHeight());
@@ -118,6 +122,50 @@ public class FireScreen extends UGameScreen {
         sp.setBounds(0,0,screenWidth,screenHeight);
         sp.setWidget(sp_group);
         stage.addActor(sp);
+    }
+
+    /**
+     * 初始化博望坡点火点
+     */
+    private void initBoWangFirePoint(){
+        bw_fparray.add(FirePoint.makeFirePoint(tx_firepoint, 554, 468));
+        bw_fparray.add(FirePoint.makeFirePoint(tx_firepoint, 1049, 582));
+        bw_fparray.add(FirePoint.makeFirePoint(tx_firepoint, 1893, 609));
+        bw_fparray.add(FirePoint.makeFirePoint(tx_firepoint, 2509, 420));
+
+        //未完成,到此处
+        bw_fparray.get(0).addCaptureListener(new ClickListener(){
+            @Override
+            public void clicked(InputEvent event, float x, float y) {
+                super.clicked(event, x, y);
+                fireSuccess(bw_fparray);
+            }
+        });
+        //未完成,到此出
+
+        bw_group.addActor(bw_fparray.get(0));
+        bw_group.addActor(bw_fparray.get(1));
+        bw_group.addActor(bw_fparray.get(2));
+        bw_group.addActor(bw_fparray.get(3));
+
+    }
+
+    /**
+     * 判断点火成功
+     * @param fps   4个点火点
+     */
+    private boolean fireSuccess(Array<FirePoint> fps){
+        Iterator<FirePoint> it = fps.iterator();
+        while(it.hasNext()){
+            FirePoint fp = it.next();
+            //其中有一个失败,则返回false
+            if(!fp.isFire())
+                return false;
+        }
+        //循环成功发送点火消息,并返回成功
+//        if()
+//        PlcCommHelper.getInstance().simpleGet("/plc_send_serial?plccmd="+);
+        return true;
     }
 
     /**
@@ -159,19 +207,18 @@ class FirePoint extends Image{
 
     public FirePoint(final Texture tx){
         super(tx);
-
         pph_fire = new ParticlePoolHelper("particle/fire.p","particle");
-        this.addCaptureListener(new ClickListener(){
+        this.addCaptureListener(new ClickListener() {
             @Override
             public void clicked(InputEvent event, float x, float y) {
                 super.clicked(event, x, y);
-                if(!isFire) {
-                    pph_fire.playAllEffect(FirePoint.this.getX()+FirePoint.this.getWidth()/2
+                if (!isFire) {
+                    pph_fire.playAllEffect(FirePoint.this.getX() + FirePoint.this.getWidth() / 2
                             , FirePoint.this.getY());
-                    for(int i=0;i<3;i++) {
-                        float rx = FirePoint.this.getX()+FirePoint.this.getWidth()/2+MathUtils.random(-300.0f,300.0f);
-                        float ry = FirePoint.this.getY()+MathUtils.random(-300.0f,300.0f);
-                        pph_fire.playAllEffect(rx,ry);
+                    for (int i = 0; i < 3; i++) {
+                        float rx = FirePoint.this.getX() + FirePoint.this.getWidth() / 2 + MathUtils.random(-300.0f, 300.0f);
+                        float ry = FirePoint.this.getY() + MathUtils.random(-300.0f, 300.0f);
+                        pph_fire.playAllEffect(rx, ry);
                     }
                     isFire = true;
                 }
