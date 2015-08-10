@@ -310,7 +310,7 @@ class StarImage extends Image implements Disposable {
     private Vector2 movePoint = new Vector2();                                                                       //移动的点
     private String id ="";                                                                                            //当前星星的标识
     private boolean isSelected = false;                                                                            //标识是否被选择
-    private OpacityListener listener = null;                                                                      //监听消失操作是否完成
+    private OpacityListener listener = null;                                                                        //监听消失操作是否完成
 
 
     public StarImage(Texture t) {

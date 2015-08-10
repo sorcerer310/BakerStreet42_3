@@ -43,9 +43,10 @@ public class FireScreen extends UGameScreen {
 
     private Image background = null;
 
-    private Array<FirePoint> bw_fparray = new Array<FirePoint>();                                                    //拨望坡所有点火点.
-    private Array<FirePoint> ts_fparray = new Array<FirePoint>();                                                    //铁锁连环所有点火点
+    private Array<FirePoint> bw_fparray = new Array<FirePoint>();                                                           //拨望坡所有点火点.
+    private Array<FirePoint> ts_fparray = new Array<FirePoint>();                                                           //铁锁连环所有点火点
 
+    private int currScreen =0;                                                                                      //当前的场景,0表示博望坡,1表示铁锁连环
     public FireScreen(){
         screenWidth = 720.0f;                                                                                           //设置游戏界面的宽高
         screenHeight = 1280.0f;
@@ -95,6 +96,9 @@ public class FireScreen extends UGameScreen {
         bw_group.addActor(bg_bowang);
         //初始化博望坡着火点
         tx_firepoint = new Texture("fire/firepoint.png");
+        //初始化博望坡的着火点
+        initBoWangFirePoint();
+
 
 
         //铁锁连环组设置
@@ -102,11 +106,8 @@ public class FireScreen extends UGameScreen {
         ts_group.addActor(bg_tiesuo);
         //初始化铁锁连环着火点
         tx_firepoint = new Texture("fire/firepoint.png");
-
-        ts_group.addActor(FirePoint.makeFirePoint(tx_firepoint, 554, 468));
-        ts_group.addActor(FirePoint.makeFirePoint(tx_firepoint, 1049, 582));
-        ts_group.addActor(FirePoint.makeFirePoint(tx_firepoint, 1893, 609));
-        ts_group.addActor(FirePoint.makeFirePoint(tx_firepoint, 2509, 420));
+        //初始化铁锁连环的着火点
+        initTieSuoFirePoint();
 
         //默认设置博望坡的组
         sp_group.setBounds(0,0,bw_group.getWidth(),bw_group.getHeight());
@@ -119,7 +120,7 @@ public class FireScreen extends UGameScreen {
      */
     private void initScrollPane(){
         sp = new ScrollPane(sp_group,new ScrollPane.ScrollPaneStyle());
-        sp.setBounds(0,0,screenWidth,screenHeight);
+        sp.setBounds(0, 0, screenWidth, screenHeight);
         sp.setWidget(sp_group);
         stage.addActor(sp);
     }
@@ -133,21 +134,39 @@ public class FireScreen extends UGameScreen {
         bw_fparray.add(FirePoint.makeFirePoint(tx_firepoint, 1893, 609));
         bw_fparray.add(FirePoint.makeFirePoint(tx_firepoint, 2509, 420));
 
-        //未完成,到此处
-        bw_fparray.get(0).addCaptureListener(new ClickListener(){
-            @Override
-            public void clicked(InputEvent event, float x, float y) {
-                super.clicked(event, x, y);
-                fireSuccess(bw_fparray);
-            }
-        });
-        //未完成,到此出
+        for(FirePoint fp:bw_fparray) {
+            //循环为每个
+            fp.addCaptureListener(new ClickListener() {
+                @Override
+                public void clicked(InputEvent event, float x, float y) {
+                    super.clicked(event, x, y);
+                    fireSuccess(bw_fparray);
+                }
+            });
+            bw_group.addActor(fp);
+        }
+    }
 
-        bw_group.addActor(bw_fparray.get(0));
-        bw_group.addActor(bw_fparray.get(1));
-        bw_group.addActor(bw_fparray.get(2));
-        bw_group.addActor(bw_fparray.get(3));
+    /**
+     * 铁锁连环点火点
+     */
+    private void initTieSuoFirePoint(){
+        ts_fparray.add(FirePoint.makeFirePoint(tx_firepoint, 554, 468));
+        ts_fparray.add(FirePoint.makeFirePoint(tx_firepoint, 1049, 582));
+        ts_fparray.add(FirePoint.makeFirePoint(tx_firepoint, 1893, 609));
+        ts_fparray.add(FirePoint.makeFirePoint(tx_firepoint, 2509, 420));
 
+        for(FirePoint fp:ts_fparray) {
+            //循环为每个
+            fp.addCaptureListener(new ClickListener() {
+                @Override
+                public void clicked(InputEvent event, float x, float y) {
+                    super.clicked(event, x, y);
+                    fireSuccess(ts_fparray);
+                }
+            });
+            ts_group.addActor(fp);
+        }
     }
 
     /**
@@ -163,8 +182,10 @@ public class FireScreen extends UGameScreen {
                 return false;
         }
         //循环成功发送点火消息,并返回成功
-//        if()
-//        PlcCommHelper.getInstance().simpleGet("/plc_send_serial?plccmd="+);
+        if(currScreen==0)
+            PlcCommHelper.getInstance().simpleGet("/plc_send_serial?plccmd=BFIRE");
+        else if(currScreen==1)
+            PlcCommHelper.getInstance().simpleGet("/plc_send_serial?plccmd=TFIRE");
         return true;
     }
 
@@ -174,6 +195,7 @@ public class FireScreen extends UGameScreen {
      */
     public void plcCommand(int cmdi) {
         System.out.println("========cmdi:"+cmdi);
+        currScreen = cmdi;
         switch (cmdi) {
             case 0:             //博网坡背景
                 sp_group.removeActor(ts_group);
