@@ -1,14 +1,8 @@
 package com.bsu.bk42;
 
-import com.badlogic.gdx.ApplicationAdapter;
 import com.badlogic.gdx.Game;
-import com.badlogic.gdx.Gdx;
-import com.badlogic.gdx.graphics.GL20;
-import com.badlogic.gdx.graphics.Texture;
-import com.badlogic.gdx.graphics.g2d.SpriteBatch;
-import com.badlogic.gdx.math.Vector2;
-import com.badlogic.gdx.utils.Array;
 import com.bsu.bk42.screen.FireScreen;
+import com.bsu.bk42.screen.FollowUpScreen;
 import com.bsu.bk42.screen.MapScreen;
 import com.bsu.bk42.screen.StarScreen;
 
@@ -18,10 +12,12 @@ public class BakerStreet42 extends Game {
 	public static final int MAPSCREEN = 0;																			//地图场景的默认索引
 	public static final int STARSCREEN = 1;																		//星星场景的默认索引
 	public static final int FIRESCREEN = 2;																		//放火场景的默认索引
+	public static final int FOLLOWUP = 3;																			//追击场景的默认索引
 
 	public static MapScreen ms = null;																				//地图场景
 	public static StarScreen ss = null;																				//星星场景
 	public static FireScreen fs = null;																				//放火场景
+	public static FollowUpScreen fus = null;																			//追击场景
 
 	@Override
 	public void create () {
@@ -31,7 +27,9 @@ public class BakerStreet42 extends Game {
 			ss = new StarScreen();
 		if(fs==null)
 			fs = new FireScreen();
-		this.setScreen(fs);
+		if(fus==null)
+			fus = new FollowUpScreen();
+		this.setScreen(ms);
 	}
 
 	/**
@@ -48,6 +46,9 @@ public class BakerStreet42 extends Game {
 				break;
 			case FIRESCREEN:
 				this.setScreen(fs);
+				break;
+			case FOLLOWUP:
+				this.setScreen(fus);
 				break;
 		}
 	}

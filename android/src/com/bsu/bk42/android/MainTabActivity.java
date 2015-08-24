@@ -36,7 +36,6 @@ public class MainTabActivity extends TabActivity {
 
         init();
         initservice();
-//        initIntent();
     }
 
     @Override
@@ -68,14 +67,17 @@ public class MainTabActivity extends TabActivity {
             }
 
         }else{
+            //如果发来的消息为星盘
+            if(urivalue.equals("star"))
+                m_radioGroup.check(R.id.main_tab_star);
             //如果发来的消息为追击
-            if(urivalue.equals("followup"))
+            else if(urivalue.equals("followup"))
                 m_radioGroup.check(R.id.main_tab_followup);
         }
     }
 
     /**
-     * 鍒濆鍖栦富鐣岄潰
+     * 初始化Tab界面
      */
     private void init(){
         m_tabHost = getTabHost();
@@ -106,6 +108,7 @@ public class MainTabActivity extends TabActivity {
                         break;
                     case R.id.main_tab_followup:
                         m_tabHost.setCurrentTabByTag(Constant.mTextviewArray[3]);
+                        MainTabActivity.game.setScreen(BakerStreet42.FOLLOWUP);             //设置当前界面为追击界面
                         break;
                 }
             }
@@ -113,34 +116,6 @@ public class MainTabActivity extends TabActivity {
         ((RadioButton) m_radioGroup.getChildAt(0)).toggle();
 
 
-    }
-
-    /**
-     * 初始化意图
-     */
-    private void initIntent(){
-        Intent intent = this.getIntent();
-        String urivalue = intent.getStringExtra(Constants.NOTIFICATION_URI);
-        if(urivalue==null)
-            return;
-        if(urivalue.contains(":")){
-            String[] ss  = urivalue.split(":");
-            //如果发来的消息为地图
-            if(ss[0].equals("map")){
-                m_radioGroup.check(R.id.main_tab_map);
-                //0:初始.1:星盘.2:乌龟.3:插旗.4:军令.5:守关3处完成.6:追击.7:守关4处放火.8:铁锁连环.9:船舱门关 10:草船借箭.11:擂鼓助威.
-                //12:宝剑咒语箱开.13:借东风.14:放火.15:选择大路追击.16:选择华容道追击
-                game.setMapCurrIndex(ss[1]);
-//                System.out.println("===============================" + ss[1]);
-            }
-        }else{
-            //如果发来的消息为放火
-            if(urivalue.equals("fire"))
-                m_radioGroup.check(R.id.main_tab_fire);
-            //如果发来的消息为追击
-            else if(urivalue.equals("followup"))
-                m_radioGroup.check(R.id.main_tab_followup);
-        }
     }
 
     /**
@@ -156,7 +131,7 @@ public class MainTabActivity extends TabActivity {
         editor.putInt("map", 0);
 
         //星盘完成状态
-        editor.putBoolean("stars",false);
+        editor.putBoolean("star",false);
 
         //放火
         //0:初始状态. 1:博望坡放火完成 2:铁锁连环放火完成
