@@ -67,7 +67,7 @@ public class MapScreen extends UGameScreen {
      * 初始化地图组上的所有元素
      */
     private void initMapGroup(){
-        tx_map = new Texture(Gdx.files.internal("map.png"));
+        tx_map = new Texture(Gdx.files.internal("map/bg_map.jpg"));
         map = new Actor(){
             {
                 this.setWidth(tx_map.getWidth());
@@ -147,9 +147,9 @@ public class MapScreen extends UGameScreen {
      * 设置迷雾云彩
      */
     public Array<Cloud> makeClouds(int[][] points){
-        tx_clouds = new Texture[]{new Texture(Gdx.files.internal("clouds/cloud1.png"))
-                ,new Texture(Gdx.files.internal("clouds/cloud2.png"))
-                ,new Texture(Gdx.files.internal("clouds/cloud3.png"))
+        tx_clouds = new Texture[]{new Texture(Gdx.files.internal("map/clouds/cloud1.png"))
+                ,new Texture(Gdx.files.internal("map/clouds/cloud2.png"))
+                ,new Texture(Gdx.files.internal("map/clouds/cloud3.png"))
         };
         Array<Cloud> clouds = new Array<Cloud>();
         for(int i=0;i<points.length;i++) {
@@ -257,7 +257,7 @@ public class MapScreen extends UGameScreen {
      * @return  返回一组标记,用于标识地图上的关键点
      */
     public Array<Mark> makeMarks(int[][] points){
-        tx_mark = new Texture(Gdx.files.internal("mark.png"));
+        tx_mark = new Texture(Gdx.files.internal("map/mark.png"));
         tx_mark.setFilter(Texture.TextureFilter.Linear, Texture.TextureFilter.Linear);
         Array<Mark> marks = new Array<Mark>();
         for(int i=0;i<points.length;i++){

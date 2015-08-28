@@ -54,7 +54,7 @@ public class StarScreen extends UGameScreen {
         this.setFPS(40.0f);
 
         //初始化背景
-        tx_starbackground = new Texture(Gdx.files.internal("starbackground.png"));
+        tx_starbackground = new Texture(Gdx.files.internal("star/starbackground.png"));
         sbi = new StarBackgroundImage(tx_starbackground){
             {
                 //背景移动完后把当前屏幕的星星切换为下一屏幕的星星.
@@ -73,7 +73,7 @@ public class StarScreen extends UGameScreen {
 
         stage.addActor(sbi);
         //初始化所有的星星
-        tx_star = new Texture(Gdx.files.internal("star.png"));
+        tx_star = new Texture(Gdx.files.internal("star/star.png"));
         all3ScreenStars = init3ScreenStars(tx_star);
         currStars = all3ScreenStars.get(currScreen);
         for(StarImage si:currStars) {
