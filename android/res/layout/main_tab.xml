@@ -37,7 +37,7 @@
 			    android:id="@+id/main_tab_map"
 			    android:checked="true" 
 			    android:text="@string/main_map"
-			    android:drawableTop="@drawable/tab_weixin"
+			    android:drawableTop="@drawable/tab_map"
 			    android:textColor="@color/tab_text"
 			    style="@style/MMTabButton" android:layout_height="wrap_content"/>
 
@@ -45,14 +45,14 @@
 		 	<RadioButton 
                 android:id="@+id/main_tab_star"
                 android:text="@string/main_star"
-                android:drawableTop="@drawable/tab_address" 
+                android:drawableTop="@drawable/tab_star"
                 android:textColor="@color/tab_text"
                 style="@style/MMTabButton" android:checked="false"/>
 			
 		 	<RadioButton 
 		 	    android:id="@+id/main_tab_fire"
 		 	    android:text="@string/main_fire"
-		 	    android:drawableTop="@drawable/tab_find_frd"
+		 	    android:drawableTop="@drawable/tab_fire"
 		 	    android:textColor="@color/tab_text" 
 		 	    style="@style/MMTabButton" android:checked="false"/>
 		 	
@@ -60,7 +60,7 @@
 		 	<RadioButton 
 		 	    android:id="@+id/main_tab_followup"
 		 	    android:text="@string/main_chase"
-		 	    android:drawableTop="@drawable/tab_settings" 
+		 	    android:drawableTop="@drawable/tab_followup"
 		 	    android:textColor="@color/tab_text"
 		 	    style="@style/MMTabButton" android:checked="false"/>
 		</RadioGroup>

@@ -6,12 +6,12 @@ import android.os.Bundle;
 
 public class Constant {
 
-	public static String mTextviewArray[] = {"AndroidLauncher", "AndroidLauncher", "AndroidLauncher", "Activity4"};
+	public static String mTextviewArray[] = {"AndroidLauncher", "AndroidLauncher", "AndroidLauncher", "AndroidLauncher"};
 	
 	public static Class mTabClassArray[]= {AndroidLauncher.class,
 		AndroidLauncher.class,
 		AndroidLauncher.class,
-		Activity4.class};
+		AndroidLauncher.class};
 
 	/**
 	 * 切换Activity时附加的意图数据
