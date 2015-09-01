@@ -77,9 +77,10 @@ public class FollowUpScreen extends UGameScreen {
             @Override
             public boolean touchDown(InputEvent event, float x, float y, int pointer, int button) {
                 System.out.println("===================touchDown1");
-                if(stateMachine.getCurrentState()==FollowUpScreenState.STATE_NOMAL) {
+                if(stateMachine.isInState(FollowUpScreenState.STATE_NOMAL)) {
                     PlcCommHelper.getInstance().simpleGet("/plc_send_serial?plccmd=HUARONG");
                     stateMachine.changeState(FollowUpScreenState.STATE_SELECTED);
+                    rbutton1.setB_cover(true);
                 }
                 return super.touchDown(event, x, y, pointer, button);
             }
@@ -89,9 +90,11 @@ public class FollowUpScreen extends UGameScreen {
             @Override
             public boolean touchDown(InputEvent event, float x, float y, int pointer, int button) {
                 System.out.println("===================touchDown2");
-                if(stateMachine.getCurrentState()==FollowUpScreenState.STATE_NOMAL) {
+                rbutton2.setB_cover(true);
+                if(stateMachine.isInState(FollowUpScreenState.STATE_NOMAL)) {
                     PlcCommHelper.getInstance().simpleGet("/plc_send_serial?plccmd=BIGROAD");
                     stateMachine.changeState(FollowUpScreenState.STATE_SELECTED);
+                    ((RoadButton)(event.getTarget())).setB_cover(true);
                 }
                 return super.touchDown(event, x, y, pointer, button);
             }
@@ -128,7 +131,7 @@ class RoadButton extends Image implements Disposable {
     private Texture texture = null;
     private Pixmap pixmap = null;
     private Texture t_cover = null;
-    private boolean b_cover = true;
+    private boolean b_cover = false;
     public RoadButton(Texture t){
         super(t);
         texture = t;
@@ -150,7 +153,7 @@ class RoadButton extends Image implements Disposable {
     public void draw(Batch batch, float parentAlpha) {
         super.draw(batch, parentAlpha);
         //绘制遮罩层
-        if (texture != null && b_cover)
+        if (texture != null && !b_cover)
             batch.draw(t_cover, this.getX(), this.getY(), (float) texture.getWidth(), (float) texture.getHeight());
     }
 
