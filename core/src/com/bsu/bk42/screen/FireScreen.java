@@ -58,6 +58,8 @@ public class FireScreen extends UGameScreen {
 
         initGroup();
         initScrollPane();
+
+//        plcCommand(1);                  //测试铁锁连环
     }
 
     /**
@@ -110,9 +112,8 @@ public class FireScreen extends UGameScreen {
         initTieSuoFirePoint();
 
         //默认设置博望坡的组
-        sp_group.setBounds(0,0,bw_group.getWidth(),bw_group.getHeight());
+        sp_group.setBounds(0,0,bw_group.getWidth(), bw_group.getHeight());
         sp_group.addActor(bw_group);
-
     }
 
     /**
@@ -151,10 +152,10 @@ public class FireScreen extends UGameScreen {
      * 铁锁连环点火点
      */
     private void initTieSuoFirePoint(){
-        ts_fparray.add(FirePoint.makeFirePoint(tx_firepoint, 554, 468));
-        ts_fparray.add(FirePoint.makeFirePoint(tx_firepoint, 1049, 582));
-        ts_fparray.add(FirePoint.makeFirePoint(tx_firepoint, 1893, 609));
-        ts_fparray.add(FirePoint.makeFirePoint(tx_firepoint, 2509, 420));
+        ts_fparray.add(FirePoint.makeFirePoint(tx_firepoint, 334, 468));
+        ts_fparray.add(FirePoint.makeFirePoint(tx_firepoint, 949, 282));
+        ts_fparray.add(FirePoint.makeFirePoint(tx_firepoint, 1410, 470));
+        ts_fparray.add(FirePoint.makeFirePoint(tx_firepoint, 1679, 230));
 
         for(FirePoint fp:ts_fparray) {
             //循环为每个
@@ -194,7 +195,7 @@ public class FireScreen extends UGameScreen {
      * @param cmdi
      */
     public void plcCommand(int cmdi) {
-        System.out.println("========cmdi:"+cmdi);
+        System.out.println("========cmdi:" + cmdi);
         currScreen = cmdi;
         switch (cmdi) {
             case 0:             //博网坡背景
@@ -210,6 +211,8 @@ public class FireScreen extends UGameScreen {
             default:
                 break;
         }
+        sp_group.setWidth(background.getWidth());
+        sp_group.setHeight(background.getHeight());
     }
 
     @Override

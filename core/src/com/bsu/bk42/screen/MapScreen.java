@@ -3,6 +3,7 @@ package com.bsu.bk42.screen;
 import aurelienribon.tweenengine.*;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.InputAdapter;
+import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.Batch;
 import com.badlogic.gdx.math.MathUtils;
@@ -32,11 +33,19 @@ public class MapScreen extends UGameScreen {
     private Texture tx_mark = null;
 
     private Group mapgroup = new Group();                                                                            //加载地图上所有元素的group
+    private int[][] cpoints;                                                                                        //保存所有云彩的点
     private int cloudsWidth = 8;
     private int cloudsHeight = 11;
     public MapScreen(){
         stage = new Stage(new StretchViewport(700.0F, 1280.0f));
         this.setFPS(40.0f);
+        //加载资源
+        tx_clouds = new Texture[]{new Texture(Gdx.files.internal("map/clouds/cloud1.png"))
+                ,new Texture(Gdx.files.internal("map/clouds/cloud2.png"))
+                ,new Texture(Gdx.files.internal("map/clouds/cloud3.png"))
+        };
+        tx_map = new Texture(Gdx.files.internal("map/bg_map.jpg"));
+
         //初始化地图元素组
         initMapGroup();
         //初始化滚动控件
@@ -61,13 +70,30 @@ public class MapScreen extends UGameScreen {
 //        plcCommand(16);
     }
 
+    /**
+     * 重设整个地图数据
+     */
+    public void resetMap(){
+        //重设云彩
+        for(int i=0;i<cpoints.length;i++) {
+            Cloud c = clouds.get(i);
+            c.setPosition(cpoints[i][0], cpoints[i][1]);                                                              //重新设置云彩坐标
+            Color color = c.getColor();
+            c.setColor(color.r, color.g, color.b, 1.0f);                                                                //重新设置云彩的透明度
+            c.setVisible(true);                                                                                         //重新设置云彩的可见性
+        }
 
+        //重设标记
+        for(Mark m:marks)
+            m.setVisible(false);
+
+    }
 
     /**
      * 初始化地图组上的所有元素
      */
     private void initMapGroup(){
-        tx_map = new Texture(Gdx.files.internal("map/bg_map.jpg"));
+
         map = new Actor(){
             {
                 this.setWidth(tx_map.getWidth());
@@ -107,7 +133,7 @@ public class MapScreen extends UGameScreen {
         for(Mark m:marks)
             mapgroup.addActor(m);
 
-        int[][] cpoints = new int[cloudsWidth*cloudsHeight][2];
+        cpoints = new int[cloudsWidth*cloudsHeight][2];
         for(int i=0;i<cloudsWidth;i++){
             for(int j=0;j<cloudsHeight;j++){
                 cpoints[j*cloudsWidth+i][0] = i*150;
@@ -147,10 +173,7 @@ public class MapScreen extends UGameScreen {
      * 设置迷雾云彩
      */
     public Array<Cloud> makeClouds(int[][] points){
-        tx_clouds = new Texture[]{new Texture(Gdx.files.internal("map/clouds/cloud1.png"))
-                ,new Texture(Gdx.files.internal("map/clouds/cloud2.png"))
-                ,new Texture(Gdx.files.internal("map/clouds/cloud3.png"))
-        };
+
         Array<Cloud> clouds = new Array<Cloud>();
         for(int i=0;i<points.length;i++) {
             Texture tx_cloud = tx_clouds[MathUtils.random(0,2)];

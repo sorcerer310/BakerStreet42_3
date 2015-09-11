@@ -73,4 +73,9 @@ public class BakerStreet42 extends Game {
 		int i = Integer.parseInt(id);
 		fs.plcCommand(i);
 	}
+
+	public MapScreen getMapScreen() {return ms;}
+	public StarScreen getStarScreen() {return ss;}
+	public FireScreen getFireScreen() {return fs;}
+	public FollowUpScreen getFollorUpScreen() {return fus;}
 }

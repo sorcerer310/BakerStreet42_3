@@ -53,8 +53,11 @@ public class StarScreen extends UGameScreen {
 
         this.setFPS(40.0f);
 
-        //初始化背景
+
         tx_starbackground = new Texture(Gdx.files.internal("star/starbackground.png"));
+        tx_star = new Texture(Gdx.files.internal("star/star.png"));
+
+        //初始化背景
         sbi = new StarBackgroundImage(tx_starbackground){
             {
                 //背景移动完后把当前屏幕的星星切换为下一屏幕的星星.
@@ -73,7 +76,7 @@ public class StarScreen extends UGameScreen {
 
         stage.addActor(sbi);
         //初始化所有的星星
-        tx_star = new Texture(Gdx.files.internal("star/star.png"));
+
         all3ScreenStars = init3ScreenStars(tx_star);
         currStars = all3ScreenStars.get(currScreen);
         for(StarImage si:currStars) {
@@ -291,6 +294,16 @@ public class StarScreen extends UGameScreen {
     public void show() {
         super.show();
         Gdx.input.setInputProcessor(stage);
+    }
+
+    /**
+     * 重设整个星图
+     */
+    public void resetStars(){
+        sbi.resetBackground();                                                                                          //重设背景
+        currScreen = 0;
+        currStars = all3ScreenStars.get(currScreen);                                                              //切到第一屏的星星
+        state = DRAWSTATE.NOMAL;                                                                                      //设置绘制状态为普通状态
     }
 
     @Override
@@ -586,6 +599,14 @@ class StarBackgroundImage extends Image implements Disposable{
                 )
                 .end()
                 .start(tm);
+    }
+
+    /**
+     * 重设背景缩放和位置.
+     */
+    public void resetBackground(){
+        this.setScale(1.0f);
+        this.setPosition(-this.getWidth() / 3 * 2, (StarScreen.screenHeight - this.getHeight()) / 2);
     }
 
     @Override

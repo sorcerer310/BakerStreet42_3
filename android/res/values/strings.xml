@@ -6,6 +6,7 @@
 
     <string name="hello_world">Hello world!</string>
     <string name="action_settings">Settings</string>
+    <string name="action_resetgame">重置游戏</string>
 
 
     <string name="net_warn_detail_doc">file:///android_asset/doc/default/network_warning.htm</string>
