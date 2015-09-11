@@ -1,5 +1,8 @@
 package com.bsu.bk42.screen;
 
+import aurelienribon.tweenengine.Timeline;
+import aurelienribon.tweenengine.Tween;
+import aurelienribon.tweenengine.TweenManager;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.Batch;
@@ -12,10 +15,12 @@ import com.badlogic.gdx.scenes.scene2d.ui.Image;
 import com.badlogic.gdx.scenes.scene2d.ui.ScrollPane;
 import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
 import com.badlogic.gdx.utils.Array;
+import com.badlogic.gdx.utils.Disposable;
 import com.badlogic.gdx.utils.viewport.StretchViewport;
 import com.bsu.bk42.PlcCommHelper;
 import com.ugame.gdx.tools.ParticlePoolHelper;
 import com.ugame.gdx.tools.UGameScreen;
+import com.ugame.gdx.tween.accessor.ActorAccessor;
 
 import java.util.Iterator;
 
@@ -199,14 +204,18 @@ public class FireScreen extends UGameScreen {
         currScreen = cmdi;
         switch (cmdi) {
             case 0:             //博网坡背景
-                sp_group.removeActor(ts_group);
+                sp_group.removeActor(ts_group);                                                                      //移除铁锁组
                 background = bg_bowang;
-                sp_group.addActor(bw_group);
+                sp_group.addActor(bw_group);                                                                         //增加博望坡组
+                for(FirePoint fp:bw_fparray)                                                                          //让博望坡的着火点都显示
+                    fp.setVisible(true);
                 break;
             case 1:             //铁锁连环背景
-                sp_group.removeActor(bw_group);
+                sp_group.removeActor(bw_group);                                                                      //移除博望坡组
                 background = bg_tiesuo;
-                sp_group.addActor(ts_group);
+                sp_group.addActor(ts_group);                                                                         //移除铁锁组
+                for(FirePoint fp:ts_fparray)                                                                          //让铁锁的着火点都显示
+                    fp.setVisible(true);
                 break;
             default:
                 break;
@@ -225,10 +234,10 @@ public class FireScreen extends UGameScreen {
 /**
  * 着火点
  */
-class FirePoint extends Image{
+class FirePoint extends Image implements Disposable {
     private ParticlePoolHelper pph_fire;
-
     private boolean isFire = false;
+    private TweenManager tm = new TweenManager();
 
     public FirePoint(final Texture tx){
         super(tx);
@@ -251,10 +260,23 @@ class FirePoint extends Image{
         });
     }
 
+    /**
+     * 让标记闪烁
+     */
+    public void flash(){
+        this.setOrigin(this.getWidth()/2,this.getHeight()/2);
+        Timeline.createSequence()
+                .push(Tween.to(this, ActorAccessor.SCALE_XY,.5f).target(.5f,.5f))
+                .push(Tween.to(this, ActorAccessor.SCALE_XY,.7f).target(1.0f,1.0f))
+                .repeat(-1,.0f)
+                .start(tm);
+    }
+
     @Override
     public void act(float delta) {
         super.act(delta);
         pph_fire.act(delta);
+        tm.update(delta);
     }
 
     @Override
@@ -263,11 +285,17 @@ class FirePoint extends Image{
         pph_fire.draw(batch, parentAlpha);
     }
 
+
+
     public boolean isFire() {
         return isFire;
     }
 
-
+    @Override
+    public void dispose() {
+        pph_fire.dispose();
+        tm.killAll();
+    }
 
     /**
      * 静态方法,用来生成该类的对象
@@ -279,6 +307,10 @@ class FirePoint extends Image{
     public static FirePoint makeFirePoint(Texture tx,float x,float y){
         FirePoint fp = new FirePoint(tx);
         fp.setPosition(x,y);
+//        fp.setVisible(false);                                                                                           //默认设置不可见,当切换到该界面的时候再显示
+        fp.flash();
         return fp;
     }
+
+
 }
