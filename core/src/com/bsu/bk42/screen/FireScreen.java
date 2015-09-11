@@ -129,10 +129,10 @@ public class FireScreen extends UGameScreen {
      * 初始化博望坡点火点
      */
     private void initBoWangFirePoint(){
-        bw_fparray.add(FirePoint.makeFirePoint(tx_firepoint, 554, 468));
-        bw_fparray.add(FirePoint.makeFirePoint(tx_firepoint, 1049, 582));
-        bw_fparray.add(FirePoint.makeFirePoint(tx_firepoint, 1893, 609));
-        bw_fparray.add(FirePoint.makeFirePoint(tx_firepoint, 2509, 420));
+        bw_fparray.add(FirePoint.makeFirePoint(tx_firepoint, 254, 200));
+        bw_fparray.add(FirePoint.makeFirePoint(tx_firepoint, 749, 182));
+        bw_fparray.add(FirePoint.makeFirePoint(tx_firepoint, 1393, 209));
+        bw_fparray.add(FirePoint.makeFirePoint(tx_firepoint, 1809, 220));
 
         for(FirePoint fp:bw_fparray) {
             //循环为每个

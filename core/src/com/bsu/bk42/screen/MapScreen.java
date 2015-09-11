@@ -42,7 +42,7 @@ public class MapScreen extends UGameScreen {
         //初始化滚动控件
         initScrollPane();
 
-//        plcCommand(0);
+        plcCommand(0);
 //        plcCommand(1);
 //        plcCommand(2);
 //        plcCommand(3);
@@ -100,7 +100,7 @@ public class MapScreen extends UGameScreen {
                 {282, 974}, {282, 1335},                                        //通道两小门
                 {115, 1652}, {368, 1652},                                       //两侧墙壁铁索连环
                 {568, 2036}, {661, 1715}, {683, 1475},                          //船舱门,草船借箭,擂鼓
-                {135,2120},{200, 2120},                                         //宝剑咒语箱子,借东风
+                {220,2120},{145, 2120},                                         //宝剑咒语箱子,借东风
                 {736, 2121},                                                    //追击小门
                 {920, 2121}, {825, 1914}                                        //大路小门,华容道小门
         });
@@ -176,13 +176,14 @@ public class MapScreen extends UGameScreen {
             case 0:
                 di = new int[]{4+0*cloudsWidth,4+1*cloudsWidth,4+2*cloudsWidth,4+3*cloudsWidth,4+4*cloudsWidth
                         ,5+0*cloudsWidth,5+1*cloudsWidth,5+2*cloudsWidth,5+3*cloudsWidth,5+4*cloudsWidth
-                        ,3+0*cloudsWidth,3+1*cloudsWidth,3+2*cloudsWidth,3+3*cloudsWidth,3+4*cloudsWidth
+//                        ,3+0*cloudsWidth,3+1*cloudsWidth,3+2*cloudsWidth,3+3*cloudsWidth,3+4*cloudsWidth
                 };
                 break;
             //茅庐消失云彩
             case 1:
                 di = new int[]{
                         2+0*cloudsWidth,2+1*cloudsWidth,2+2*cloudsWidth,2+3*cloudsWidth,2+4*cloudsWidth
+                        ,3+0*cloudsWidth,3+1*cloudsWidth,3+2*cloudsWidth,3+3*cloudsWidth,3+4*cloudsWidth
                 };
                 break;
             //博望坡消失云彩
@@ -290,7 +291,7 @@ public class MapScreen extends UGameScreen {
         {282, 974}, {282, 1335},                                        //通道两小门
         {115, 1652}, {368, 1652},                                       //两侧墙壁铁索连环
         {568, 2036}, {661, 1715}, {683, 1475},                          //船舱门,草船借箭,擂鼓
-        {135,2120},{200, 2120},                                         //宝剑咒语箱子,借东风
+        {220,2120},{145, 2120},                                         //宝剑咒语箱子,借东风
         {736, 2121},                                                    //追击小门
         {920, 2121}, {825, 1914}                                        //大路小门,华容道小门
         消失云彩:

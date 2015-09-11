@@ -34,6 +34,7 @@ public class MainTabActivity extends TabActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.main_tab);
 
+
         init();
         initservice();
     }
@@ -48,10 +49,12 @@ public class MainTabActivity extends TabActivity {
     protected void onNewIntent(Intent intent) {
         super.onNewIntent(intent);
         String urivalue = intent.getStringExtra(Constants.NOTIFICATION_URI);
-        if(urivalue==null)
+        if(urivalue==null && !urivalue.contains(":"))
             return;
         if(urivalue.contains(":")){
             String[] ss  = urivalue.split(":");
+            if(ss.length<2)
+                return;
             //如果发来的消息为地图
             if(ss[0].equals("map")){
                 m_radioGroup.check(R.id.main_tab_map);
