@@ -281,9 +281,10 @@ class FirePoint extends Image implements Disposable {
      * 创建动画
      */
     private void makeTween(){
+        this.setScale(2.0f);
         tl = Timeline.createSequence()
-                .push(Tween.to(this, ActorAccessor.SCALE_XY,.4f).target(.5f,.5f))
-                .push(Tween.to(this, ActorAccessor.SCALE_XY,.8f).target(1.0f,1.0f))
+                .push(Tween.to(this, ActorAccessor.SCALE_XY,.4f).target(1.0f,1.0f))
+                .push(Tween.to(this, ActorAccessor.SCALE_XY,.8f).target(2.0f,2.0f))
                 .repeat(-1,.0f);
     }
 
@@ -303,9 +304,9 @@ class FirePoint extends Image implements Disposable {
         tl.free();
         makeTween();
         flash();
-        this.setVisible(false);
         pph_fire.stopEffect();
         isFire = false;
+        this.setVisible(false);
     }
 
     @Override
@@ -319,7 +320,14 @@ class FirePoint extends Image implements Disposable {
     @Override
     public void draw(Batch batch, float parentAlpha) {
         super.draw(batch, parentAlpha);
-        pph_fire.draw(batch, parentAlpha);
+        try{
+            pph_fire.draw(batch, parentAlpha);
+        }catch (Exception e){
+
+        }
+//        pph_fire.
+//        if(pph_fire!=null)
+//            pph_fire.draw(batch, parentAlpha);
     }
 
 

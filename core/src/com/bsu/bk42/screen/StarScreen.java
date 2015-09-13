@@ -354,6 +354,10 @@ class StarImage extends Image implements Disposable {
      * 创建所有动画
      */
     private void makeTween(){
+        this.setScale(1.5f);
+        Color color = this.getColor();
+        this.setColor(color.r,color.g,color.b,.0f);
+
         float delay = MathUtils.random(0.5f,0.9f);
         float minval = MathUtils.random(0.2f,0.6f);
 
@@ -372,7 +376,7 @@ class StarImage extends Image implements Disposable {
                                 .push(Tween.to(this, ActorAccessor.OPACITY, delay).target(1.0f)
                                                 .ease(TweenEquations.easeNone)
                                 )
-                                .push(Tween.to(this, ActorAccessor.SCALE_XY, delay).target(1.0f, 1.0f)
+                                .push(Tween.to(this, ActorAccessor.SCALE_XY, delay).target(1.5f, 1.5f)
                                                 .ease(TweenEquations.easeNone)
                                 )
                 ).repeat(-1, .0f);
@@ -391,7 +395,7 @@ class StarImage extends Image implements Disposable {
                     }
                 });
 
-        tl_app = Tween.to(this,ActorAccessor.OPACITY,.6f).target(1.0f)
+        tl_app = Tween.to(this,ActorAccessor.OPACITY,.6f).target(1.5f)
                 .ease(TweenEquations.easeNone).setCallback(new TweenCallback() {
                     @Override
                     public void onEvent(int i, BaseTween<?> baseTween) {
