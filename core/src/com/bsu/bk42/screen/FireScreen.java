@@ -196,6 +196,21 @@ public class FireScreen extends UGameScreen {
     }
 
     /**
+     * 重设点火界面
+     */
+    public void resetFireScreen(){
+        //设置博望坡界面
+        sp_group.setBounds(0, 0, bw_group.getWidth(), bw_group.getHeight());
+        sp_group.addActor(bw_group);
+
+        for(FirePoint fp:bw_fparray)
+            fp.resetFirePoint();
+
+        for(FirePoint fp:ts_fparray)
+            fp.resetFirePoint();
+    }
+
+    /**
      * 获得androidpn发过来的命令,当为0时显示博望坡背景,当为1时显示铁锁连环背景
      * @param cmdi
      */
@@ -237,7 +252,8 @@ public class FireScreen extends UGameScreen {
 class FirePoint extends Image implements Disposable {
     private ParticlePoolHelper pph_fire;
     private boolean isFire = false;
-    private TweenManager tm = new TweenManager();
+//    private TweenManager tm = new TweenManager();
+    private Timeline tl;
 
     public FirePoint(final Texture tx){
         super(tx);
@@ -258,25 +274,46 @@ class FirePoint extends Image implements Disposable {
                 }
             }
         });
+        makeTween();
+    }
+
+    /**
+     * 创建动画
+     */
+    private void makeTween(){
+        tl = Timeline.createSequence()
+                .push(Tween.to(this, ActorAccessor.SCALE_XY,.4f).target(.5f,.5f))
+                .push(Tween.to(this, ActorAccessor.SCALE_XY,.8f).target(1.0f,1.0f))
+                .repeat(-1,.0f);
     }
 
     /**
      * 让标记闪烁
      */
     public void flash(){
-        this.setOrigin(this.getWidth()/2,this.getHeight()/2);
-        Timeline.createSequence()
-                .push(Tween.to(this, ActorAccessor.SCALE_XY,.5f).target(.5f,.5f))
-                .push(Tween.to(this, ActorAccessor.SCALE_XY,.7f).target(1.0f,1.0f))
-                .repeat(-1,.0f)
-                .start(tm);
+        this.setOrigin(this.getWidth() / 2, this.getHeight() / 2);
+        tl.start();
+    }
+
+    /**
+     * 重设着火点
+     */
+    public void resetFirePoint(){
+        tl.kill();
+        tl.free();
+        makeTween();
+        flash();
+        this.setVisible(false);
+        pph_fire.stopEffect();
+        isFire = false;
     }
 
     @Override
     public void act(float delta) {
         super.act(delta);
         pph_fire.act(delta);
-        tm.update(delta);
+        if(tl!=null)
+            tl.update(delta);
     }
 
     @Override
@@ -294,7 +331,8 @@ class FirePoint extends Image implements Disposable {
     @Override
     public void dispose() {
         pph_fire.dispose();
-        tm.killAll();
+        tl.kill();
+        tl.free();
     }
 
     /**
@@ -307,7 +345,7 @@ class FirePoint extends Image implements Disposable {
     public static FirePoint makeFirePoint(Texture tx,float x,float y){
         FirePoint fp = new FirePoint(tx);
         fp.setPosition(x,y);
-//        fp.setVisible(false);                                                                                           //默认设置不可见,当切换到该界面的时候再显示
+        fp.setVisible(false);                                                                                           //默认设置不可见,当切换到该界面的时候再显示
         fp.flash();
         return fp;
     }

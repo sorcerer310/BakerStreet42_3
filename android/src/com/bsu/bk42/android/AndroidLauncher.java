@@ -106,7 +106,7 @@ public class AndroidLauncher extends AndroidApplication {
 	private void resetGame(){
 		MainTabActivity.game.getMapScreen().resetMap();
 		MainTabActivity.game.getStarScreen().resetStars();
-//		MainTabActivity.game.getFireScreen()
+		MainTabActivity.game.getFireScreen().resetFireScreen();
 	}
 
 

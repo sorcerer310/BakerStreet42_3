@@ -3,7 +3,6 @@ package com.bsu.bk42.screen;
 import aurelienribon.tweenengine.*;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.*;
-import com.badlogic.gdx.graphics.g2d.Batch;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 import com.badlogic.gdx.math.MathUtils;
 import com.badlogic.gdx.math.Vector2;
@@ -18,6 +17,8 @@ import com.ugame.gdx.tools.ParticlePoolHelper;
 import com.ugame.gdx.tools.UGameScreen;
 import com.ugame.gdx.tween.accessor.ActorAccessor;
 import com.ugame.net.UGameNetInstance;
+
+import java.util.List;
 
 
 /**
@@ -146,7 +147,7 @@ public class StarScreen extends UGameScreen {
                                         sbi.goRight();                                                                  //背景向右移动
                                         disappearCount = 0;                                                           //消失的星星统计归0
                                         currStars = all3ScreenStars.get(++currScreen);                             //切到下一屏的星星
-                                        stage.getActors().removeValue(si, true);                                       //动画完成移除所有星星
+//                                        stage.getActors().removeValue(si, true);                                       //动画完成移除所有星星
                                     }
                                 }
 
@@ -166,7 +167,7 @@ public class StarScreen extends UGameScreen {
                                 public void disappearCompleted(StarImage si) {
                                     if (++disappearCount == currStars.size) {
                                         sbi.goScale();
-                                        stage.getActors().removeValue(si, true);                                           //动画完成移除所有星星
+//                                        stage.getActors().removeValue(si, true);                                           //动画完成移除所有星星
                                     }
                                 }
 
@@ -301,8 +302,22 @@ public class StarScreen extends UGameScreen {
      */
     public void resetStars(){
         sbi.resetBackground();                                                                                          //重设背景
+
+
+        disappearCount=0;
         currScreen = 0;
-        currStars = all3ScreenStars.get(currScreen);                                                              //切到第一屏的星星
+        currStars = all3ScreenStars.get(currScreen);
+        for(int i=0;i<all3ScreenStars.size;i++){
+            for(StarImage si:all3ScreenStars.get(i)){
+                Color color = si.getColor();
+                si.setColor(color.r,color.g,color.b,.0f);
+                si.setIsSelected(false);
+                si.resetStar();
+                if(i==currScreen){
+                    si.appear();
+                }
+            }
+        }
         state = DRAWSTATE.NOMAL;                                                                                      //设置绘制状态为普通状态
     }
 
@@ -320,6 +335,7 @@ public class StarScreen extends UGameScreen {
 class StarImage extends Image implements Disposable {
     private TweenManager tm = new TweenManager();                                                                     //动画管理器
     private Timeline tl = null;
+    private Tween tl_dis,tl_app = null;
     private Vector2 movePoint = new Vector2();                                                                       //移动的点
     private String id ="";                                                                                            //当前星星的标识
     private boolean isSelected = false;                                                                            //标识是否被选择
@@ -330,8 +346,17 @@ class StarImage extends Image implements Disposable {
         super(t);
         this.setOrigin(t.getWidth() / 2, t.getHeight() / 2);
         Tween.registerAccessor(Image.class, new ActorAccessor());
+        makeTween();
+//        tl.start();
+    }
+
+    /**
+     * 创建所有动画
+     */
+    private void makeTween(){
         float delay = MathUtils.random(0.5f,0.9f);
         float minval = MathUtils.random(0.2f,0.6f);
+
         tl = Timeline.createSequence()
                 .push(
                         Timeline.createParallel()
@@ -351,38 +376,54 @@ class StarImage extends Image implements Disposable {
                                                 .ease(TweenEquations.easeNone)
                                 )
                 ).repeat(-1, .0f);
+        tl_dis = Tween.to(this, ActorAccessor.OPACITY, .6f).target(.0f)
+                .ease(TweenEquations.easeNone).setCallback(new TweenCallback() {
+                    @Override
+                    public void onEvent(int i, BaseTween<?> baseTween) {
+                        tl.kill();
+                        tl.free();
+                        tl_dis.kill();
+                        tl_dis.free();
+                        tl_app.kill();
+                        tl_app.free();
+                        if (i == TweenCallback.COMPLETE && listener != null)
+                            listener.disappearCompleted(StarImage.this);
+                    }
+                });
+
+        tl_app = Tween.to(this,ActorAccessor.OPACITY,.6f).target(1.0f)
+                .ease(TweenEquations.easeNone).setCallback(new TweenCallback() {
+                    @Override
+                    public void onEvent(int i, BaseTween<?> baseTween) {
+                        tl.start();
+                        if (i == TweenCallback.COMPLETE && listener != null) {
+                            listener.appearCompleted(StarImage.this);
+                        }
+                    }
+                });
+
     }
 
     /**
      * 消失动作
      */
     public void disappear(){
-        Tween.to(this, ActorAccessor.OPACITY, .6f).target(.0f)
-                .ease(TweenEquations.easeNone).setCallback(new TweenCallback() {
-            @Override
-            public void onEvent(int i, BaseTween<?> baseTween) {
-                tl.kill();
-                tm.killAll();
-                if (i == TweenCallback.COMPLETE && listener != null)
-                    listener.disappearCompleted(StarImage.this);
-            }
-        }).start(tm);
+        tl_dis.start();
     }
 
     /**
      * 出现动作
      */
     public void appear(){
-        Tween.to(this,ActorAccessor.OPACITY,.6f).target(1.0f)
-                .ease(TweenEquations.easeNone).setCallback(new TweenCallback() {
-            @Override
-            public void onEvent(int i, BaseTween<?> baseTween) {
-                tl.start();
-                if (i == TweenCallback.COMPLETE && listener != null) {
-                    listener.appearCompleted(StarImage.this);
-                }
-            }
-        }).start(tm);
+        tl_app.start();
+    }
+
+    /**
+     * 重设星星
+     */
+    public void resetStar(){
+        isSelected = false;
+        makeTween();
     }
 
     @Override
@@ -390,7 +431,10 @@ class StarImage extends Image implements Disposable {
         super.act(delta);
         if(tl!=null)
             tl.update(delta);
-        tm.update(delta);
+        if(tl_dis!=null)
+            tl_dis.update(delta);
+        if(tl_app!=null)
+            tl_app.update(delta);
     }
 
     public boolean isSelected() {
@@ -421,7 +465,7 @@ class StarImage extends Image implements Disposable {
     @Override
     public void dispose() {
         tl.kill();
-        tm.killAll();
+//        tm.killAll();
     }
 
     /**
@@ -432,106 +476,6 @@ class StarImage extends Image implements Disposable {
         public void appearCompleted(StarImage si);
     }
 }
-
-/**
- * 背景
- */
-//class StarBackgroundImage extends Group{
-//    private TweenManager tm = new TweenManager();
-//    private Texture sbg1 = new Texture(Gdx.files.internal("starbackground1.png"));
-//    private Texture sbg2 = new Texture(Gdx.files.internal("starbackground2.png"));
-//    private Image img1,img2;
-//    private MoveListener listener = null;
-//    public StarBackgroundImage(){
-//        super();
-////        this.setPosition(-this.getWidth() / 3 * 2, (StarScreen.screenHeight-this.getHeight())/2);
-//        img1 = new Image(sbg1);
-//        this.addActor(img1);
-//
-//        img2 = new Image(sbg2);
-//        Color c = img2.getColor();
-//        img2.setColor(c.r, c.g, c.b,.5f);
-//        img2.setPosition(65, 92);
-//        this.addActor(img2);
-//
-//        this.setPosition(-this.getWidth() / 3 * 2, 0);
-//        Tween.registerAccessor(Image.class, new ActorAccessor());
-//    }
-//
-//    /**
-//     * 向左移动一屏
-//     */
-//    public void goLeft(){
-//        //如果移动位置超过了自身的2/3就不能向左移动了
-//        if(this.getX()>-this.getWidth()/3*2)
-//            Tween.to(this,ActorAccessor.POS_XY,1.0f).target(this.getX() - this.getWidth() / 3, this.getY())
-//                    .setCallback(new TweenCallback() {
-//                        @Override
-//                        public void onEvent(int i, BaseTween<?> baseTween) {
-//                            if (i == TweenCallback.COMPLETE && listener != null)
-//                                listener.completed(StarBackgroundImage.this);
-//                        }
-//                    }).start(tm);
-//    }
-//
-//
-//    /**
-//     * 向右移动一屏
-//     */
-//    public void goRight(){
-//        //如果移动位置超过了0,就不能向右移动了
-//        if(this.getX()<0) {
-//            Tween.to(this, ActorAccessor.POS_XY, 1.0f)
-//                    .target(this.getX() + this.getWidth() / 3, this.getY())
-//                    .setCallback(new TweenCallback() {
-//                        @Override
-//                        public void onEvent(int i, BaseTween<?> baseTween) {
-//                            if(i==TweenCallback.COMPLETE && listener!=null)
-//                                listener.completed(StarBackgroundImage.this);
-//                        }
-//                    }).start(tm);
-//        }
-//    }
-//
-//    /**
-//     * 将画面缩小,显示全图
-//     */
-//    public void goScale(){
-////        this.setOrigin(this.getWidth()/2,this.getHeight()/2);
-//        Color c = img2.getColor();
-//        img2.setColor(c.r,c.g,c.b,1.0f);
-//        Timeline.createParallel()
-//                .beginParallel()
-//                .push(
-//                        Tween.to(this, ActorAccessor.SCALE_XY, 1.0f)
-//                                .target(.3333f, .3333f)
-//                )
-//                .push(
-//                        Tween.to(this, ActorAccessor.POS_XY,1.0f)
-//                                .target(this.getX(),this.getY()+this.getHeight()*0.3333f)
-//                )
-//                .end()
-//                .start(tm);
-//    }
-//
-//
-//    @Override
-//    public void act(float delta) {
-//        super.act(delta);
-//        tm.update(delta);
-//    }
-//
-//    public void setMoveListener(MoveListener listener) {
-//        this.listener = listener;
-//    }
-//
-//    /**
-//     * 移动监听器
-//     */
-//    static interface MoveListener {
-//        public void completed(StarBackgroundImage sbi);
-//    }
-//}
 
 /**
  *  星盘的背景图
