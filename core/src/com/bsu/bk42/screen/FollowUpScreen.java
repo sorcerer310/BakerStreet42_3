@@ -85,14 +85,14 @@ public class FollowUpScreen extends UGameScreen {
             public void enter(FollowUpScreen entity) {
                 entity.stage.getActors().clear();                                                                      //清除stage的内容
                 entity.stage.addActor(entity.gguanyu);                                                                //将道路选择的内容增加进去
-                System.out.println("=======================STAGE_QUESTION");
             }
             @Override
             public void update(FollowUpScreen entity) {}
             @Override
             public void exit(FollowUpScreen entity) {}
             @Override
-            public boolean onMessage(FollowUpScreen entity, Telegram telegram) {return false;}
+            public boolean onMessage(FollowUpScreen entity, Telegram telegram) {
+                return false;}
         }
     }
 
@@ -109,7 +109,7 @@ public class FollowUpScreen extends UGameScreen {
         initRoadButton();
         initQuestion();
         //初始化状态机部分
-        stateMachine = new DefaultStateMachine<FollowUpScreen>(this,FollowUpScreenState.STATE_NO_ENABLE);
+        stateMachine = new DefaultStateMachine<FollowUpScreen>(this,FollowUpScreenState.STATE_NOMAL);
 
 
     }
@@ -131,11 +131,12 @@ public class FollowUpScreen extends UGameScreen {
             @Override
             public boolean touchDown(InputEvent event, float x, float y, int pointer, int button) {
                 if(((RoadButton)event.getTarget()).isEnable()) {
-                    System.out.println("===================touchDown1");
+
                     if (stateMachine.isInState(FollowUpScreenState.STATE_NOMAL)) {
                         PlcCommHelper.getInstance().simpleGet("/plc_send_serial?plccmd=HUARONG");
                         stateMachine.changeState(FollowUpScreenState.STATE_SELECTED);
                         rbutton1.setB_cover(true);
+                        System.out.println("===================touchDown1");
                     }
                 }
                 return super.touchDown(event, x, y, pointer, button);
@@ -147,11 +148,11 @@ public class FollowUpScreen extends UGameScreen {
             public boolean touchDown(InputEvent event, float x, float y, int pointer, int button) {
                 System.out.println("===================touchDown2");
                 if (((RoadButton) event.getTarget()).isEnable()) {
-                    rbutton2.setB_cover(true);
                     if (stateMachine.isInState(FollowUpScreenState.STATE_NOMAL)) {
                         PlcCommHelper.getInstance().simpleGet("/plc_send_serial?plccmd=BIGROAD");
                         stateMachine.changeState(FollowUpScreenState.STATE_QUESTION);
                         ((RoadButton) (event.getTarget())).setB_cover(true);
+                        rbutton2.setB_cover(true);
                     }
                 }
                 return super.touchDown(event, x, y, pointer, button);
@@ -251,20 +252,25 @@ class QuestionGroup extends Group implements Disposable {
         this.addActor(bg_guanyu);                                                                                     //增加背景
 
 
-        questions.add(new Question("丞相！前方有关羽率军堵截，我军该如何应对", 1,
-                new String[]{"A.曹操:自此绝境，只好以死相拼。全军出击！","程昱:关云长素以忠义著称，昔日丞相曾有恩于他，不妨上前哀告，或可脱此危难"}));                                               //增加答案
+        questions.add(new Question("丞相！前方有关羽率军堵截，我军该如何应对？", 1,
+                new String[]{"A.曹操:自此绝境，只好以死相拼。全军出击！", "B.程昱:关云长素以忠义著称，昔日丞相曾有恩于他，不妨上前哀告，或可脱此危难"}));                                               //增加答案
         questions.add(new Question("关羽奉军师将令,在此等候丞相多时.",1,
-                new String[]{"孤今日虽遭此大败，乃时运不济。纵然死于此处，实在难以心服。","今日兵败于此，望将军以昔日情谊为重…"}));                                                 //增加答案
+                new String[]{"A.孤今日虽遭此大败，乃时运不济。纵然死于此处，实在难以心服。","B.今日兵败于此，望将军以昔日情谊为重…"}));                                                 //增加答案
         questions.add(new Question("昔日，丞相却是待我不薄，然而我斩颜良诛文丑已报过丞相之恩，今日岂可以私废公？",0,
-                new String[]{"A.云长过五关斩将之时，孤并不曾派兵追赶，反而传令与将军放行，大丈夫应以信义为重，将军忍心杀害故交吗？","倘若孤今日丧命于此，东吴岂会容汝等全身而退，以令兄玄德之军力，必为周瑜所图，届时，天下危矣，汉室危矣…"}));                                                 //增加答案
+                new String[]{"A.云长过五关斩将之时，孤并不曾派兵追赶，反而传令与将军放行，大丈夫应以信义为重，将军忍心杀害故交吗？","B.倘若孤今日丧命于此，东吴岂会容汝等全身而退，以令兄玄德之军力，必为周瑜所图，届时，天下危矣，汉室危矣…"}));                                                 //增加答案
         questions.add(new Question("",1,new String[]{"A.曹操缓步率军通过华容道.","B.趁关羽犹豫，进一步晓之以理动之以情"}));                                                 //增加答案
 
         makeQuestion(questions.get(0));
+        this.addActor(qagroup);
     }
 
     private Group qagroup = new Group();
     public void makeQuestion(Question q){
         Label l = WidgetFactory.makeLabel(bf,q.question);
+        l.setPosition(60,800);
+        l.setFontScaleY(-1);
+        l.setWrap(true);
+        l.setWidth(600);
         TextButton tb1 = WidgetFactory.makeTextButton(q.answer.get(0), bf);
         TextButton tb2 = WidgetFactory.makeTextButton(q.answer.get(1),bf);
         qagroup.addActor(l);
