@@ -74,8 +74,11 @@ public class MainTabActivity extends TabActivity {
             if(urivalue.equals("star"))
                 m_radioGroup.check(R.id.main_tab_star);
             //如果发来的消息为追击
-            else if(urivalue.equals("followup"))
+            else if(urivalue.equals("followup")) {
                 m_radioGroup.check(R.id.main_tab_followup);
+                game.setFollowupEnable();
+            }
+
         }
     }
 

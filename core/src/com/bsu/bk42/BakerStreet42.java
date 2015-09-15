@@ -74,6 +74,13 @@ public class BakerStreet42 extends Game {
 		fs.plcCommand(i);
 	}
 
+	/**
+	 * 设置追击界面可用
+	 */
+	public void setFollowupEnable(){
+		fus.setFollowUpEnable();
+	}
+
 	public MapScreen getMapScreen() {return ms;}
 	public StarScreen getStarScreen() {return ss;}
 	public FireScreen getFireScreen() {return fs;}

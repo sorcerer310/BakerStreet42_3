@@ -107,6 +107,7 @@ public class AndroidLauncher extends AndroidApplication {
 		MainTabActivity.game.getMapScreen().resetMap();
 		MainTabActivity.game.getStarScreen().resetStars();
 		MainTabActivity.game.getFireScreen().resetFireScreen();
+		MainTabActivity.game.getFollorUpScreen().resetFollowUpScreen();
 	}
 
 

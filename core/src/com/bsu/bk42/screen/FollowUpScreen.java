@@ -12,10 +12,7 @@ import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.Batch;
 import com.badlogic.gdx.graphics.g2d.BitmapFont;
 import com.badlogic.gdx.math.MathUtils;
-import com.badlogic.gdx.scenes.scene2d.Group;
-import com.badlogic.gdx.scenes.scene2d.InputEvent;
-import com.badlogic.gdx.scenes.scene2d.InputListener;
-import com.badlogic.gdx.scenes.scene2d.Stage;
+import com.badlogic.gdx.scenes.scene2d.*;
 import com.badlogic.gdx.scenes.scene2d.ui.Image;
 import com.badlogic.gdx.scenes.scene2d.ui.Label;
 import com.badlogic.gdx.scenes.scene2d.ui.Table;
@@ -57,6 +54,11 @@ public class FollowUpScreen extends UGameScreen {
                 entity.stage.addActor(entity.gbutton);                                                                //将道路选择的内容增加进去
                 entity.rbutton1.setEnable(false);                                                                     //进入该状态后设置按钮不可用
                 entity.rbutton2.setEnable(false);
+                entity.gguanyu.resetQuestionGroup();
+                entity.img_success.resetStampImage();
+                entity.img_failed.resetStampImage();
+                entity.rbutton1.setB_cover(false);
+                entity.rbutton2.setB_cover(false);
             }
             @Override
             public void update(FollowUpScreen entity) {}
@@ -78,17 +80,6 @@ public class FollowUpScreen extends UGameScreen {
             @Override
             public boolean onMessage(FollowUpScreen entity, Telegram telegram) {return false;}
         },
-        STATE_SELECTED(){
-            @Override
-            public void enter(FollowUpScreen entity) {
-            }
-            @Override
-            public void update(FollowUpScreen entity) {}
-            @Override
-            public void exit(FollowUpScreen entity) {}
-            @Override
-            public boolean onMessage(FollowUpScreen entity, Telegram telegram) {return false;}
-        },
         STATE_QUESTION(){
             @Override
             public void enter(FollowUpScreen entity) {
@@ -102,10 +93,27 @@ public class FollowUpScreen extends UGameScreen {
             @Override
             public boolean onMessage(FollowUpScreen entity, Telegram telegram) {
                 return false;}
+        },
+        STATE_END(){
+            @Override
+            public void enter(FollowUpScreen entity) {
+                entity.gguanyu.setEnable(false);
+            }
+            @Override
+            public void update(FollowUpScreen entity) {}
+            @Override
+            public void exit(FollowUpScreen entity) {}
+            @Override
+            public boolean onMessage(FollowUpScreen entity, Telegram telegram) {return false;}
         }
     }
 
-
+    /**
+     * 重设追击界面
+     */
+    public void resetFollowUpScreen(){
+        stateMachine.changeState(FollowUpScreenState.STATE_NO_ENABLE);
+    }
 
     public FollowUpScreen(){
         //视口初始化
@@ -119,7 +127,7 @@ public class FollowUpScreen extends UGameScreen {
         initQuestion();
         initResultImage();
         //初始化状态机部分
-        stateMachine = new DefaultStateMachine<FollowUpScreen>(this,FollowUpScreenState.STATE_NOMAL);
+        stateMachine = new DefaultStateMachine<FollowUpScreen>(this,FollowUpScreenState.STATE_NO_ENABLE);
 
 
     }
@@ -143,10 +151,9 @@ public class FollowUpScreen extends UGameScreen {
                 if(((RoadButton)event.getTarget()).isEnable()) {
 
                     if (stateMachine.isInState(FollowUpScreenState.STATE_NOMAL)) {
-                        PlcCommHelper.getInstance().simpleGet("/plc_send_serial?plccmd=HUARONG");
-                        stateMachine.changeState(FollowUpScreenState.STATE_SELECTED);
+//                        PlcCommHelper.getInstance().simpleGet("/plc_send_serial?plccmd=HUARONG");
+                        stateMachine.changeState(FollowUpScreenState.STATE_QUESTION);
                         rbutton1.setB_cover(true);
-                        System.out.println("===================touchDown1");
                     }
                 }
                 return super.touchDown(event, x, y, pointer, button);
@@ -156,13 +163,12 @@ public class FollowUpScreen extends UGameScreen {
         rbutton2.addCaptureListener(new InputListener() {
             @Override
             public boolean touchDown(InputEvent event, float x, float y, int pointer, int button) {
-                System.out.println("===================touchDown2");
                 if (((RoadButton) event.getTarget()).isEnable()) {
                     if (stateMachine.isInState(FollowUpScreenState.STATE_NOMAL)) {
-                        PlcCommHelper.getInstance().simpleGet("/plc_send_serial?plccmd=BIGROAD");
-                        stateMachine.changeState(FollowUpScreenState.STATE_QUESTION);
-                        ((RoadButton) (event.getTarget())).setB_cover(true);
+//                        ((RoadButton) (event.getTarget())).setB_cover(true);
+                        stateMachine.changeState(FollowUpScreenState.STATE_END);
                         rbutton2.setB_cover(true);
+                        PlcCommHelper.getInstance().simpleGet("/plc_send_serial?plccmd=BIGROAD");
                     }
                 }
                 return super.touchDown(event, x, y, pointer, button);
@@ -183,14 +189,15 @@ public class FollowUpScreen extends UGameScreen {
         gguanyu.setQuestionListener(new QuestionGroup.QuestionListener() {
             @Override
             public void success() {
-                System.out.println("success");
+//                System.out.println("success");
                 img_success.drop(100, 100);
+                stateMachine.changeState(FollowUpScreenState.STATE_END);
             }
 
             @Override
             public void failed() {
-                System.out.println("failed");
                 img_failed.drop(100, 100);
+                stateMachine.changeState(FollowUpScreenState.STATE_END);
             }
         });
     }
@@ -208,21 +215,36 @@ public class FollowUpScreen extends UGameScreen {
         img_success.setStampCompleteListener(new StampImage.StampComplete() {
             @Override
             public void stampComplete() {
-                shake();
+//                shake();
+                PlcCommHelper.getInstance().simpleGet("/plc_send_serial?plccmd=HUARONGSUCCESS");
+            }
+        });
+        img_failed.setStampCompleteListener(new StampImage.StampComplete() {
+            @Override
+            public void stampComplete() {
+//                shake();
+                PlcCommHelper.getInstance().simpleGet("/plc_send_serial?plccmd=HUARONGFAILED");
             }
         });
 
-        tl_shake = Timeline.createSequence()
-                .push(Tween.to(gguanyu, ActorAccessor.POS_XY, .2f).target(MathUtils.random(-5.0f, 5.0f), MathUtils.random(-5.0f, 5.0f)))
-                .push(Tween.to(gguanyu,ActorAccessor.POS_XY,.2f).target(MathUtils.random(-5.0f,5.0f),MathUtils.random(-5.0f,5.0f)))
-                .push(Tween.to(gguanyu,ActorAccessor.POS_XY,.2f).target(MathUtils.random(-5.0f,5.0f),MathUtils.random(-5.0f,5.0f)))
-                .push(Tween.to(gguanyu,ActorAccessor.POS_XY,.2f).target(MathUtils.random(-5.0f,5.0f),MathUtils.random(-5.0f,5.0f)))
-                .push(Tween.to(gguanyu,ActorAccessor.POS_XY,.2f).target(MathUtils.random(-5.0f,5.0f),MathUtils.random(-5.0f,5.0f)))
-                .push(Tween.to(gguanyu,ActorAccessor.POS_XY,.2f).target(0,0));
-
-
         gguanyu.addActor(img_success);
         gguanyu.addActor(img_failed);
+
+        tl_shake = Timeline.createSequence()
+                .push(Tween.to((Actor)gguanyu, ActorAccessor.POS_XY, .0f).target(MathUtils.random(-5.0f, 5.0f) + img_failed.getX(), MathUtils.random(-5.0f, 5.0f) + img_failed.getY()))
+                .pushPause(.1f)
+                .push(Tween.to((Actor)gguanyu, ActorAccessor.POS_XY, .0f).target(MathUtils.random(-5.0f, 5.0f) + img_failed.getX(), MathUtils.random(-5.0f, 5.0f) + img_failed.getY()))
+                .pushPause(.1f)
+                .push(Tween.to((Actor)gguanyu, ActorAccessor.POS_XY, .0f).target(MathUtils.random(-5.0f, 5.0f) + img_failed.getX(), MathUtils.random(-5.0f, 5.0f) + img_failed.getY()))
+                .pushPause(.1f)
+                .push(Tween.to((Actor)gguanyu, ActorAccessor.POS_XY, .0f).target(MathUtils.random(-5.0f, 5.0f) + img_failed.getX(), MathUtils.random(-5.0f, 5.0f) + img_failed.getY()))
+                .pushPause(.1f)
+                .push(Tween.to((Actor)gguanyu, ActorAccessor.POS_XY, .0f).target(MathUtils.random(-5.0f, 5.0f) + img_failed.getX(), MathUtils.random(-5.0f, 5.0f) + img_failed.getY()))
+                .pushPause(.1f)
+                .push(Tween.to((Actor)gguanyu, ActorAccessor.POS_XY, .0f).target(img_failed.getX(), img_failed.getY()));
+
+
+
     }
 
     private Timeline tl_shake;
@@ -239,6 +261,10 @@ public class FollowUpScreen extends UGameScreen {
         stateMachine.update();
         if(tl_shake!=null)
             tl_shake.update(delta);
+    }
+
+    public void setFollowUpEnable(){
+        stateMachine.changeState(FollowUpScreenState.STATE_NOMAL);
     }
 
     @Override
@@ -314,6 +340,7 @@ class QuestionGroup extends Group implements Disposable {
     private Table table;
     private Label l;
     private QuestionListener listener = null;
+    private boolean enable = true;
 
     public QuestionGroup(Texture t){
 //        this.setSize(720,1024);
@@ -334,10 +361,9 @@ class QuestionGroup extends Group implements Disposable {
         questions.add(new Question("", 1, new String[]{"A.曹操缓步率军通过华容道.", "B.趁关羽犹豫，进一步晓之以理动之以情"}));                                                 //增加答案
 
         makeQuestion();
+        this.removeActor(table);
         table = setQuestion(questions.get(currQuestionIndex));
         this.addActor(table);
-
-
     }
 
     public void makeQuestion(){
@@ -352,6 +378,8 @@ class QuestionGroup extends Group implements Disposable {
         tb1.addCaptureListener(new ClickListener() {
             @Override
             public boolean touchDown(InputEvent event, float x, float y, int pointer, int button) {
+                if (!enable)
+                    return false;
                 tb1.getLabel().setFontScale(.9f);
                 return true;
             }
@@ -371,8 +399,10 @@ class QuestionGroup extends Group implements Disposable {
         tb2.addCaptureListener(new ClickListener() {
             @Override
             public boolean touchDown(InputEvent event, float x, float y, int pointer, int button) {
+                if (!enable)
+                    return false;
                 tb2.getLabel().setFontScale(.9f);
-                return super.touchDown(event, x, y, pointer, button);
+                return true;
             }
 
             @Override
@@ -385,11 +415,22 @@ class QuestionGroup extends Group implements Disposable {
     }
 
     /**
+     * 重设问题组
+     */
+    public void resetQuestionGroup(){
+        currQuestionIndex = 0;
+        enable = true;
+        this.removeActor(table);
+        table = setQuestion(questions.get(0));
+        this.addActor(table);
+    }
+
+    /**
      * 判断答案是否正确
      * @param correctIndex  正确答案的序号
      */
     private void judgeAnswer(int correctIndex){
-        if(questions.get(currQuestionIndex).correctIndex==0) {
+        if(questions.get(currQuestionIndex).correctIndex==correctIndex) {
             if(currQuestionIndex==3){
                 //胜利操作
                 if(listener!=null)
@@ -413,7 +454,7 @@ class QuestionGroup extends Group implements Disposable {
      * 设置问题
      * @param q     问题对象,从中取出问题与答案的文字
      */
-    private Table setQuestion(Question q){
+    private Table setQuestion(Question q) {
         l.setText(q.question);
         tb1.setText(q.answer.get(0));
         tb2.setText(q.answer.get(1));
@@ -435,6 +476,14 @@ class QuestionGroup extends Group implements Disposable {
      */
     public void setQuestionListener(QuestionListener listener) {
         this.listener = listener;
+    }
+
+    /**
+     * 设置是否可用
+     * @param enable
+     */
+    public void setEnable(boolean enable) {
+        this.enable = enable;
     }
 
     @Override
@@ -477,28 +526,34 @@ class StampImage extends Image implements Disposable{
         super(t);
         Color color = this.getColor();
         this.setColor(color.r,color.g,color.b,.0f);
-        tl = Timeline.createParallel()
-                .push(
-                        Tween.to(this, ActorAccessor.OPACITY, 1.0f).target(1.0f)
-                ).push(
-                        Timeline.createSequence()
-                                .push(
-                                        Tween.to(this, ActorAccessor.SCALE_XY, 1.0f).target(.5f, .5f).ease(TweenEquations.easeInOutExpo)
-                                ).push(Tween.call(new TweenCallback(){
-                            @Override
-                            public void onEvent(int type, BaseTween<?> source) {
-                                if(listener!=null)
-                                    listener.stampComplete();
-                            }
-                        }))
-                );
     }
     public void drop(int x,int y){
         this.setPosition(x, y);
         Color color = this.getColor();
         this.setColor(color.r, color.g, color.b, .0f);
         this.setScale(1.0f);
-        tl.start();
+//        tl.start();
+        tl = Timeline.createParallel()
+                .push(
+                        Tween.to(this, ActorAccessor.OPACITY, 1.0f).target(1.0f)
+                ).push(
+                        Timeline.createSequence()
+                                .push(
+                                        Tween.to(this, ActorAccessor.SCALE_XY, 1.5f).target(.7f, .7f).ease(TweenEquations.easeInOutExpo)
+                                ).push(Tween.call(new TweenCallback() {
+                            @Override
+                            public void onEvent(int type, BaseTween<?> source) {
+                                if (listener != null)
+                                    listener.stampComplete();
+                            }
+                        }))
+                ).start();
+    }
+
+    public void resetStampImage(){
+        Color color = this.getColor();
+        this.setColor(color.r,color.g,color.b,.0f);
+        this.setScale(1.0f);
     }
 
     @Override
