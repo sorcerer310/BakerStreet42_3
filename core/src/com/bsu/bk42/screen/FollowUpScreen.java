@@ -1,27 +1,35 @@
 package com.bsu.bk42.screen;
 
+import aurelienribon.tweenengine.*;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.ai.fsm.DefaultStateMachine;
 import com.badlogic.gdx.ai.fsm.State;
 import com.badlogic.gdx.ai.fsm.StateMachine;
 import com.badlogic.gdx.ai.msg.Telegram;
+import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.Pixmap;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.Batch;
 import com.badlogic.gdx.graphics.g2d.BitmapFont;
+import com.badlogic.gdx.math.MathUtils;
 import com.badlogic.gdx.scenes.scene2d.Group;
 import com.badlogic.gdx.scenes.scene2d.InputEvent;
 import com.badlogic.gdx.scenes.scene2d.InputListener;
 import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.scenes.scene2d.ui.Image;
 import com.badlogic.gdx.scenes.scene2d.ui.Label;
+import com.badlogic.gdx.scenes.scene2d.ui.Table;
 import com.badlogic.gdx.scenes.scene2d.ui.TextButton;
+import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
+import com.badlogic.gdx.scenes.scene2d.utils.Drawable;
+import com.badlogic.gdx.utils.Align;
 import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.Disposable;
 import com.badlogic.gdx.utils.viewport.StretchViewport;
 import com.bsu.bk42.PlcCommHelper;
 import com.ugame.gdx.tools.UGameScreen;
 import com.ugame.gdx.tools.WidgetFactory;
+import com.ugame.gdx.tween.accessor.ActorAccessor;
 
 /**
  * Created by fengchong on 2015/8/22.
@@ -35,15 +43,16 @@ public class FollowUpScreen extends UGameScreen {
 
     private Texture t_guanyu = null;                                                                                 //关羽图片纹理资源
 
-    private Group gguanyu = new Group();                                                                             //问答题组
+    private QuestionGroup gguanyu = null;                                                                            //问答题组
+
+    private Texture t_success,t_failed = null;                                                                     //成功\失败的纹理
+    private StampImage img_success,img_failed = null;                                                                   //成功失败的图
 
     private StateMachine stateMachine;                                                                               //状态机对象,用来控制界面状态.
     enum FollowUpScreenState implements State<FollowUpScreen> {
         STATE_NO_ENABLE(){
             @Override
             public void enter(FollowUpScreen entity) {
-                System.out.println("+++++++++++++++++++++STATE_NO_ENABLE");
-
                 entity.stage.getActors().clear();                                                                      //清除stage的内容
                 entity.stage.addActor(entity.gbutton);                                                                //将道路选择的内容增加进去
                 entity.rbutton1.setEnable(false);                                                                     //进入该状态后设置按钮不可用
@@ -108,6 +117,7 @@ public class FollowUpScreen extends UGameScreen {
 
         initRoadButton();
         initQuestion();
+        initResultImage();
         //初始化状态机部分
         stateMachine = new DefaultStateMachine<FollowUpScreen>(this,FollowUpScreenState.STATE_NOMAL);
 
@@ -167,16 +177,68 @@ public class FollowUpScreen extends UGameScreen {
     /**
      * 初始化问题部分.
      */
-    private void initQuestion(){
+    private void initQuestion() {
         t_guanyu = new Texture(Gdx.files.internal("followup/bg_guanyu.jpg"));
         gguanyu = new QuestionGroup(t_guanyu);
-//        stage.addActor(gguanyu);
+        gguanyu.setQuestionListener(new QuestionGroup.QuestionListener() {
+            @Override
+            public void success() {
+                System.out.println("success");
+                img_success.drop(100, 100);
+            }
+
+            @Override
+            public void failed() {
+                System.out.println("failed");
+                img_failed.drop(100, 100);
+            }
+        });
+    }
+
+    /**
+     * 初始化结果图
+     */
+    private void initResultImage(){
+        t_success = new Texture(Gdx.files.internal("followup/vic.png"));
+        t_failed = new Texture(Gdx.files.internal("followup/defeat.png"));
+        img_success = new StampImage(t_success);
+        img_failed = new StampImage(t_failed);
+
+
+        img_success.setStampCompleteListener(new StampImage.StampComplete() {
+            @Override
+            public void stampComplete() {
+                shake();
+            }
+        });
+
+        tl_shake = Timeline.createSequence()
+                .push(Tween.to(gguanyu, ActorAccessor.POS_XY, .2f).target(MathUtils.random(-5.0f, 5.0f), MathUtils.random(-5.0f, 5.0f)))
+                .push(Tween.to(gguanyu,ActorAccessor.POS_XY,.2f).target(MathUtils.random(-5.0f,5.0f),MathUtils.random(-5.0f,5.0f)))
+                .push(Tween.to(gguanyu,ActorAccessor.POS_XY,.2f).target(MathUtils.random(-5.0f,5.0f),MathUtils.random(-5.0f,5.0f)))
+                .push(Tween.to(gguanyu,ActorAccessor.POS_XY,.2f).target(MathUtils.random(-5.0f,5.0f),MathUtils.random(-5.0f,5.0f)))
+                .push(Tween.to(gguanyu,ActorAccessor.POS_XY,.2f).target(MathUtils.random(-5.0f,5.0f),MathUtils.random(-5.0f,5.0f)))
+                .push(Tween.to(gguanyu,ActorAccessor.POS_XY,.2f).target(0,0));
+
+
+        gguanyu.addActor(img_success);
+        gguanyu.addActor(img_failed);
+    }
+
+    private Timeline tl_shake;
+    /**
+     * 摇晃屏幕
+     */
+    private void shake(){
+        tl_shake.start();
     }
 
     @Override
     public void render(float delta) {
         super.render(delta);
         stateMachine.update();
+        if(tl_shake!=null)
+            tl_shake.update(delta);
     }
 
     @Override
@@ -191,6 +253,10 @@ public class FollowUpScreen extends UGameScreen {
         t_road1.dispose();
         t_road2.dispose();
         t_guanyu.dispose();
+        if(tl_shake!=null) {
+            tl_shake.kill();
+            tl_shake.free();
+        }
     }
 }
 
@@ -244,38 +310,131 @@ class QuestionGroup extends Group implements Disposable {
     private int currQuestionIndex = 0;                                                                              //当前问题的序号
     private Array<Question> questions = new Array<Question>();                                                       //所有问题
     private BitmapFont bf = null;                                                                                     //问题的文字
+    private TextButton tb1,tb2;
+    private Table table;
+    private Label l;
+    private QuestionListener listener = null;
+
     public QuestionGroup(Texture t){
+//        this.setSize(720,1024);
         texture = t;
-        bf = new BitmapFont(Gdx.files.internal("followup/question.fnt"),Gdx.files.internal("followup/question.png"),true);
+        bf = new BitmapFont(Gdx.files.internal("followup/question.fnt"),Gdx.files.internal("followup/question.png"),false);
         bg_guanyu = new Image(texture);
-//        bg_guanyu.setBounds(0,0,100,100);
+        Color c_gy = bg_guanyu.getColor();
+        bg_guanyu.setColor(c_gy.r, c_gy.g, c_gy.b, .7f);
         this.addActor(bg_guanyu);                                                                                     //增加背景
 
 
         questions.add(new Question("丞相！前方有关羽率军堵截，我军该如何应对？", 1,
                 new String[]{"A.曹操:自此绝境，只好以死相拼。全军出击！", "B.程昱:关云长素以忠义著称，昔日丞相曾有恩于他，不妨上前哀告，或可脱此危难"}));                                               //增加答案
-        questions.add(new Question("关羽奉军师将令,在此等候丞相多时.",1,
-                new String[]{"A.孤今日虽遭此大败，乃时运不济。纵然死于此处，实在难以心服。","B.今日兵败于此，望将军以昔日情谊为重…"}));                                                 //增加答案
-        questions.add(new Question("昔日，丞相却是待我不薄，然而我斩颜良诛文丑已报过丞相之恩，今日岂可以私废公？",0,
-                new String[]{"A.云长过五关斩将之时，孤并不曾派兵追赶，反而传令与将军放行，大丈夫应以信义为重，将军忍心杀害故交吗？","B.倘若孤今日丧命于此，东吴岂会容汝等全身而退，以令兄玄德之军力，必为周瑜所图，届时，天下危矣，汉室危矣…"}));                                                 //增加答案
-        questions.add(new Question("",1,new String[]{"A.曹操缓步率军通过华容道.","B.趁关羽犹豫，进一步晓之以理动之以情"}));                                                 //增加答案
+        questions.add(new Question("关羽奉军师将令,在此等候丞相多时.", 1,
+                new String[]{"A.孤今日虽遭此大败，乃时运不济。纵然死于此处，实在难以心服。", "B.今日兵败于此，望将军以昔日情谊为重…"}));                                                 //增加答案
+        questions.add(new Question("昔日，丞相却是待我不薄，然而我斩颜良诛文丑已报过丞相之恩，今日岂可以私废公？", 0,
+                new String[]{"A.云长过五关斩将之时，孤并不曾派兵追赶，反而传令与将军放行，大丈夫应以信义为重，将军忍心杀害故交吗？", "B.倘若孤今日丧命于此，东吴岂会容汝等全身而退，以令兄玄德之军力，必为周瑜所图，届时，天下危矣，汉室危矣…"}));                                                 //增加答案
+        questions.add(new Question("", 1, new String[]{"A.曹操缓步率军通过华容道.", "B.趁关羽犹豫，进一步晓之以理动之以情"}));                                                 //增加答案
 
-        makeQuestion(questions.get(0));
-        this.addActor(qagroup);
+        makeQuestion();
+        table = setQuestion(questions.get(currQuestionIndex));
+        this.addActor(table);
+
+
     }
 
-    private Group qagroup = new Group();
-    public void makeQuestion(Question q){
-        Label l = WidgetFactory.makeLabel(bf,q.question);
-        l.setPosition(60,800);
-        l.setFontScaleY(-1);
+    public void makeQuestion(){
+        l = WidgetFactory.makeLabel(bf, "");
         l.setWrap(true);
-        l.setWidth(600);
-        TextButton tb1 = WidgetFactory.makeTextButton(q.answer.get(0), bf);
-        TextButton tb2 = WidgetFactory.makeTextButton(q.answer.get(1),bf);
-        qagroup.addActor(l);
-        qagroup.addActor(tb1);
-        qagroup.addActor(tb2);
+        l.setWidth(700);
+
+        tb1 = WidgetFactory.makeTextButton("", bf);
+        tb1.getLabel().setWrap(true);
+        tb1.getLabel().setWidth(600);
+        tb1.getLabel().setAlignment(Align.left);
+        tb1.addCaptureListener(new ClickListener() {
+            @Override
+            public boolean touchDown(InputEvent event, float x, float y, int pointer, int button) {
+                tb1.getLabel().setFontScale(.9f);
+                return true;
+            }
+
+            @Override
+            public void touchUp(InputEvent event, float x, float y, int pointer, int button) {
+                super.touchUp(event, x, y, pointer, button);
+                tb1.getLabel().setFontScale(1.0f);
+                judgeAnswer(0);
+            }
+        });
+
+        tb2 = WidgetFactory.makeTextButton("",bf);
+        tb2.getLabel().setWrap(true);
+        tb2.getLabel().setWidth(600);
+        tb2.getLabel().setAlignment(Align.left);
+        tb2.addCaptureListener(new ClickListener() {
+            @Override
+            public boolean touchDown(InputEvent event, float x, float y, int pointer, int button) {
+                tb2.getLabel().setFontScale(.9f);
+                return super.touchDown(event, x, y, pointer, button);
+            }
+
+            @Override
+            public void touchUp(InputEvent event, float x, float y, int pointer, int button) {
+                super.touchUp(event, x, y, pointer, button);
+                tb2.getLabel().setFontScale(1.0f);
+                judgeAnswer(1);
+            }
+        });
+    }
+
+    /**
+     * 判断答案是否正确
+     * @param correctIndex  正确答案的序号
+     */
+    private void judgeAnswer(int correctIndex){
+        if(questions.get(currQuestionIndex).correctIndex==0) {
+            if(currQuestionIndex==3){
+                //胜利操作
+                if(listener!=null)
+                    listener.success();
+                return;
+            }
+
+            currQuestionIndex++;
+            QuestionGroup.this.removeActor(table);
+            table = QuestionGroup.this.setQuestion(questions.get(currQuestionIndex));
+            QuestionGroup.this.addActor(table);
+        }
+        else{
+            //失败操作
+            if(listener!=null)
+                listener.failed();
+        }
+    }
+
+    /**
+     * 设置问题
+     * @param q     问题对象,从中取出问题与答案的文字
+     */
+    private Table setQuestion(Question q){
+        l.setText(q.question);
+        tb1.setText(q.answer.get(0));
+        tb2.setText(q.answer.get(1));
+
+        Table root = new Table();
+        root.setSize(720, 1280);
+
+        root.add(l).width(700).row();
+        root.add(tb1).width(600).height(tb1.getLabel().getPrefHeight()).spaceBottom(20).spaceTop(60).row();
+        root.add(tb2).width(600).height(tb2.getLabel().getPrefHeight());
+        root.center();
+
+        return root;
+    }
+
+    /**
+     * 设置监听器,监听成功或者失败
+     * @param listener  监听器对象
+     */
+    public void setQuestionListener(QuestionListener listener) {
+        this.listener = listener;
     }
 
     @Override
@@ -297,5 +456,76 @@ class QuestionGroup extends Group implements Disposable {
             for(String s:as)
                 answer.add(s);                                                                                         //所有的答案
         }
+    }
+
+    /**
+     * 监听操作成功或者失败
+     */
+    static interface QuestionListener{
+        void success();
+        void failed();
+    }
+}
+
+/**
+ * 图章类
+ */
+class StampImage extends Image implements Disposable{
+    private Timeline tl = null;
+    private StampComplete listener = null;
+    public StampImage(Texture t){
+        super(t);
+        Color color = this.getColor();
+        this.setColor(color.r,color.g,color.b,.0f);
+        tl = Timeline.createParallel()
+                .push(
+                        Tween.to(this, ActorAccessor.OPACITY, 1.0f).target(1.0f)
+                ).push(
+                        Timeline.createSequence()
+                                .push(
+                                        Tween.to(this, ActorAccessor.SCALE_XY, 1.0f).target(.5f, .5f).ease(TweenEquations.easeInOutExpo)
+                                ).push(Tween.call(new TweenCallback(){
+                            @Override
+                            public void onEvent(int type, BaseTween<?> source) {
+                                if(listener!=null)
+                                    listener.stampComplete();
+                            }
+                        }))
+                );
+    }
+    public void drop(int x,int y){
+        this.setPosition(x, y);
+        Color color = this.getColor();
+        this.setColor(color.r, color.g, color.b, .0f);
+        this.setScale(1.0f);
+        tl.start();
+    }
+
+    @Override
+    public void act(float delta) {
+        super.act(delta);
+        if(tl!=null)
+            tl.update(delta);
+    }
+
+
+    @Override
+    public void dispose() {
+        if(tl!=null) {
+            tl.kill();
+            tl.free();
+        }
+    }
+
+    /**
+     * 设置监听器
+     * @param listener
+     */
+    public void setStampCompleteListener(StampComplete listener) {
+        this.listener = listener;
+    }
+
+    static interface StampComplete{
+        void stampComplete();
     }
 }
