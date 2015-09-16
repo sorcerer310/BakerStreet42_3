@@ -151,7 +151,7 @@ public class FollowUpScreen extends UGameScreen {
                 if(((RoadButton)event.getTarget()).isEnable()) {
 
                     if (stateMachine.isInState(FollowUpScreenState.STATE_NOMAL)) {
-//                        PlcCommHelper.getInstance().simpleGet("/plc_send_serial?plccmd=HUARONG");
+                        PlcCommHelper.getInstance().simpleGet("/plc_send_serial?plccmd=HUARONG");
                         stateMachine.changeState(FollowUpScreenState.STATE_QUESTION);
                         rbutton1.setB_cover(true);
                     }
