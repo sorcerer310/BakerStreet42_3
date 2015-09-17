@@ -462,8 +462,8 @@ class QuestionGroup extends Group implements Disposable {
         Table root = new Table();
         root.setSize(720, 1280);
 
-        root.add(l).width(700).row();
-        root.add(tb1).width(600).height(tb1.getLabel().getPrefHeight()).spaceBottom(20).spaceTop(60).row();
+        root.add(l).width(650).row();
+        root.add(tb1).width(600).height(tb1.getLabel().getPrefHeight()).spaceBottom(50).spaceTop(80).row();
         root.add(tb2).width(600).height(tb2.getLabel().getPrefHeight());
         root.center();
 
