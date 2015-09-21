@@ -4,6 +4,7 @@ import aurelienribon.tweenengine.Timeline;
 import aurelienribon.tweenengine.Tween;
 import aurelienribon.tweenengine.TweenManager;
 import com.badlogic.gdx.Gdx;
+import com.badlogic.gdx.audio.Sound;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.Batch;
 import com.badlogic.gdx.math.MathUtils;
@@ -52,6 +53,8 @@ public class FireScreen extends UGameScreen {
     private Array<FirePoint> ts_fparray = new Array<FirePoint>();                                                           //铁锁连环所有点火点
 
     private int currScreen =0;                                                                                      //当前的场景,0表示博望坡,1表示铁锁连环
+
+    private Sound s_bowang,s_chibi;
     public FireScreen(){
         screenWidth = 720.0f;                                                                                           //设置游戏界面的宽高
         screenHeight = 1280.0f;
@@ -60,6 +63,9 @@ public class FireScreen extends UGameScreen {
         scaleHeight = Gdx.graphics.getHeight()/screenHeight;
 
         this.setFPS(40.0f);
+
+        s_bowang = Gdx.audio.newSound(Gdx.files.internal("fire/bowang.ogg"));
+        s_chibi = Gdx.audio.newSound(Gdx.files.internal("fire/chibi.ogg"));
 
         initGroup();
         initScrollPane();
@@ -224,6 +230,7 @@ public class FireScreen extends UGameScreen {
                 sp_group.addActor(bw_group);                                                                         //增加博望坡组
                 for(FirePoint fp:bw_fparray)                                                                          //让博望坡的着火点都显示
                     fp.setVisible(true);
+                s_bowang.play();
                 break;
             case 1:             //铁锁连环背景
                 sp_group.removeActor(bw_group);                                                                      //移除博望坡组
@@ -231,6 +238,7 @@ public class FireScreen extends UGameScreen {
                 sp_group.addActor(ts_group);                                                                         //移除铁锁组
                 for(FirePoint fp:ts_fparray)                                                                          //让铁锁的着火点都显示
                     fp.setVisible(true);
+                s_chibi.play();
                 break;
             default:
                 break;

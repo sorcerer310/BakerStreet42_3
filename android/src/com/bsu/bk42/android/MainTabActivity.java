@@ -2,11 +2,13 @@ package com.bsu.bk42.android;
 
 import android.app.Activity;
 import android.app.ActivityManager;
+import android.app.Service;
 import android.app.TabActivity;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
+import android.os.Vibrator;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.widget.RadioButton;
@@ -49,8 +51,10 @@ public class MainTabActivity extends TabActivity {
     protected void onNewIntent(Intent intent) {
         super.onNewIntent(intent);
         String urivalue = intent.getStringExtra(Constants.NOTIFICATION_URI);
-        if(urivalue==null && !urivalue.contains(":"))
+        if(urivalue==null || !urivalue.contains(":"))
             return;
+
+        vibrate(this,500);                                                                                              //震动500ms
         if(urivalue.contains(":")){
             String[] ss  = urivalue.split(":");
             if(ss.length<2)
@@ -128,7 +132,7 @@ public class MainTabActivity extends TabActivity {
      * 初始化配置参数
      */
     private void initPreferences(){
-        settings = this.getSharedPreferences("StatusDatas",MODE_PRIVATE);
+        settings = this.getSharedPreferences("StatusDatas", MODE_PRIVATE);
         SharedPreferences.Editor editor = settings.edit();
 
         //地图的状态
@@ -145,7 +149,7 @@ public class MainTabActivity extends TabActivity {
 
         //追击
         //0:初始. 1:选择大路追击 2:选择小路追击
-        editor.putInt("fllowup",0);
+        editor.putInt("fllowup", 0);
     }
 
     /**
@@ -157,5 +161,14 @@ public class MainTabActivity extends TabActivity {
         serviceManager.startService();
     }
 
+    /**
+     * 手机震动函数
+     * @param activity
+     * @param milliseconds
+     */
+    private void vibrate(final Activity activity, long milliseconds) {
+        Vibrator vib = (Vibrator) activity.getSystemService(Service.VIBRATOR_SERVICE);
+        vib.vibrate(milliseconds);
+    }
 
 }

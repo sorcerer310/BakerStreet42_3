@@ -53,12 +53,15 @@ public class AndroidLauncher extends AndroidApplication {
 		if(id==R.id.action_settings){
 			Toast.makeText(this, "action_setting", Toast.LENGTH_SHORT).show();
 			dlg_rstgame.show();
+			et.setText("");
+//			((EditText)LayoutInflater.from(this).inflate(R.layout.game_reset_dialog, null).findViewById(R.id.et_password)).setText("");
 			return true;
 		}
 		return super.onMenuItemSelected(featureId, item);
 	}
 	//对话框对象
 	private AlertDialog dlg_rstgame;
+	private EditText et;
 	/**
 	 * 初始化输入密码对话框
 	 */
@@ -68,7 +71,7 @@ public class AndroidLauncher extends AndroidApplication {
 		View gameResetDialogView = li.inflate(R.layout.game_reset_dialog, null);
 
 		//获得密码编辑框
-		final EditText et = (EditText) gameResetDialogView.findViewById(R.id.et_password);
+		et = (EditText) gameResetDialogView.findViewById(R.id.et_password);
 		et.setText("");
 
 		//定义输入密码的对话框
@@ -100,7 +103,6 @@ public class AndroidLauncher extends AndroidApplication {
 					}})
 				.setNeutralButton("取消", null)
 				.create();
-		et.setText("");
 	}
 
 //	private Handler handler = new Handler(){
