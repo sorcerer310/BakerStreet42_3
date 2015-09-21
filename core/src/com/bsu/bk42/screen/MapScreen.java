@@ -58,6 +58,7 @@ public class MapScreen extends UGameScreen {
 //        plcCommand(4);
 //        plcCommand(5);
 //        plcCommand(6);
+
 //        plcCommand(7);
 //        plcCommand(8);
 //        plcCommand(9);
@@ -121,10 +122,10 @@ public class MapScreen extends UGameScreen {
         mapgroup.setBounds(0, 0, tx_map.getWidth(), tx_map.getHeight());
         mapgroup.addActor(map);
         marks = makeMarks(new int[][]{
-                {764, 598},                                                     //星盘
-                {620, 883}, {525, 202},                                         //乌龟,插旗
-                {284, 156}, {417, 256}, {121, 441}, {134, 889}, {413, 889},     //军令台,4个脚踏
-                {282, 974}, {282, 1335},                                        //通道两小门
+                {770, 580},                                                     //星盘
+                {620, 883}, {530, 550},                                         //乌龟,插旗
+                {480, 120}, {480, 880}, {140, 350}, {140, 889}, {480, 260},     //军令台,4个脚踏
+                {330, 1335},{330, 974},                                         //通道两小门
                 {115, 1652}, {368, 1652},                                       //两侧墙壁铁索连环
                 {568, 2036}, {661, 1715}, {683, 1475},                          //船舱门,草船借箭,擂鼓
                 {220,2120},{145, 2120},                                         //宝剑咒语箱子,借东风
@@ -361,6 +362,7 @@ public class MapScreen extends UGameScreen {
             case 5:             //踩上3个脚踏
                 //3个脚踏亮
                 appearMark(4);appearMark(5);appearMark(6);
+                appearMark(9);
                 //通道云彩消失
                 dispareClouds(3);
                 //移动地图焦点
