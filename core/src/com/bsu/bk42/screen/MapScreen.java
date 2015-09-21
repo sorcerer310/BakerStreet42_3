@@ -87,6 +87,7 @@ public class MapScreen extends UGameScreen {
         for(Mark m:marks)
             m.setVisible(false);
 
+        plcCommand(0);
     }
 
     /**

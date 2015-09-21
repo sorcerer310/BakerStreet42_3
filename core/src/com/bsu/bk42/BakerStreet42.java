@@ -85,4 +85,8 @@ public class BakerStreet42 extends Game {
 	public StarScreen getStarScreen() {return ss;}
 	public FireScreen getFireScreen() {return fs;}
 	public FollowUpScreen getFollorUpScreen() {return fus;}
+	//重置服务器状态
+	public void resetServer(){
+		PlcCommHelper.getInstance().simpleGet("/plc_init_serial");
+	}
 }

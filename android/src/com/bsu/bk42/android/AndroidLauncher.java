@@ -4,6 +4,8 @@ import android.app.AlertDialog;
 import android.content.DialogInterface;
 import android.os.Bundle;
 
+import android.os.Handler;
+import android.os.Message;
 import android.view.*;
 import android.widget.EditText;
 import android.widget.Toast;
@@ -77,7 +79,7 @@ public class AndroidLauncher extends AndroidApplication {
 					@Override
 					public void onClick(DialogInterface dialog, int arg1) {
 						if(et.getText().toString().equals(PREFERENCES_CLEAR_PASSWORD)){
-							Toast.makeText(AndroidLauncher.this, "重置游戏成功", Toast.LENGTH_SHORT).show();
+//							Toast.makeText(AndroidLauncher.this, "重置游戏成功", Toast.LENGTH_SHORT).show();
 							//密码正确先重置服务器数据
 //							try {
 //								//向服务器发送命令重置换服务器各项数据
@@ -90,6 +92,7 @@ public class AndroidLauncher extends AndroidApplication {
 							//密码正确则清除数据
 							//重置客户端数据
 							resetGame();
+//							Toast.makeText(AndroidLauncher.this,retstr,Toast.LENGTH_LONG).show();
 						}
 						else
 							Toast.makeText(AndroidLauncher.this, "密码错误", Toast.LENGTH_SHORT).show();
@@ -97,8 +100,21 @@ public class AndroidLauncher extends AndroidApplication {
 					}})
 				.setNeutralButton("取消", null)
 				.create();
+		et.setText("");
 	}
 
+//	private Handler handler = new Handler(){
+//		@Override
+//		public void handleMessage(Message msg) {
+//			super.handleMessage(msg);
+//			try {
+//				byte[] bytes  = Utils.sendPostRequestByForm("http://192.168.1.112:8080/pgc2/plc_init_serial","");
+//				String ret = new String(bytes);
+//			} catch (Exception e) {
+//				e.printStackTrace();
+//			}
+//		}
+//	};
 
 	/**
 	 * 重设游戏
@@ -108,6 +124,8 @@ public class AndroidLauncher extends AndroidApplication {
 		MainTabActivity.game.getStarScreen().resetStars();
 		MainTabActivity.game.getFireScreen().resetFireScreen();
 		MainTabActivity.game.getFollorUpScreen().resetFollowUpScreen();
+		MainTabActivity.game.resetServer();
+//		handler.sendEmptyMessage(0);
 	}
 
 
