@@ -33,6 +33,8 @@
         <activity
             android:name=".MainTabActivity"
             android:label="@string/title_activity_main_tab"
+            android:screenOrientation="portrait"
+            android:configChanges="keyboard|keyboardHidden|orientation|screenSize"
             android:launchMode="singleInstance">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
