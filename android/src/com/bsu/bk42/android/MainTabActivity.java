@@ -133,12 +133,15 @@ public class MainTabActivity extends TabActivity {
                                     public void onClick(DialogInterface dialog, int which) {
                                         MainTabActivity.game.getFollorUpScreen().selectRoad(isBigRoad);
                                         dialog.dismiss();
+                                        MainTabActivity.game.getFollorUpScreen().stopAllSound();                        //确认界面消失停止所有声音
+
                                     }
                                 });
                                 builder.setNegativeButton("再想想", new DialogInterface.OnClickListener() {
                                     @Override
                                     public void onClick(DialogInterface dialog, int which) {
                                         dialog.dismiss();
+                                        MainTabActivity.game.getFollorUpScreen().stopAllSound();                        //确认界面消失停止所有声音
                                     }
                                 });
                                 builder.setCancelable(false);
@@ -146,6 +149,7 @@ public class MainTabActivity extends TabActivity {
                                 new Thread(){
                                     public void run() {
                                         Looper.prepare();
+                                        //显示选择窗口
                                         confirmDialog = builder.create();
                                         confirmDialog.show();
                                         Looper.loop();

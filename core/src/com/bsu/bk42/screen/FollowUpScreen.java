@@ -6,6 +6,7 @@ import com.badlogic.gdx.ai.fsm.DefaultStateMachine;
 import com.badlogic.gdx.ai.fsm.State;
 import com.badlogic.gdx.ai.fsm.StateMachine;
 import com.badlogic.gdx.ai.msg.Telegram;
+import com.badlogic.gdx.audio.Sound;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.Pixmap;
 import com.badlogic.gdx.graphics.Texture;
@@ -18,12 +19,12 @@ import com.badlogic.gdx.scenes.scene2d.ui.Label;
 import com.badlogic.gdx.scenes.scene2d.ui.Table;
 import com.badlogic.gdx.scenes.scene2d.ui.TextButton;
 import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
-import com.badlogic.gdx.scenes.scene2d.utils.Drawable;
 import com.badlogic.gdx.utils.Align;
 import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.Disposable;
 import com.badlogic.gdx.utils.viewport.StretchViewport;
 import com.bsu.bk42.PlcCommHelper;
+import com.bsu.bk42.sound.ExtSound;
 import com.ugame.gdx.tools.UGameScreen;
 import com.ugame.gdx.tools.WidgetFactory;
 import com.ugame.gdx.tween.accessor.ActorAccessor;
@@ -33,8 +34,8 @@ import com.ugame.gdx.tween.accessor.ActorAccessor;
  */
 public class FollowUpScreen extends UGameScreen {
     public static float screenWidth,screenHeight,scaleWidth,scaleHeight;
-    private Texture t_road1 = null;                                                                                  //华容道图片
-    private Texture t_road2 = null;                                                                                  //大路图片
+    private Texture t_bigroad = null;                                                                                //华容道图片
+    private Texture t_huarong = null;                                                                               //大路图片
     private RoadButton rbutton1,rbutton2;
     private Group gbutton = new Group();                                                                             //设置按钮组
 
@@ -86,6 +87,7 @@ public class FollowUpScreen extends UGameScreen {
             public void enter(FollowUpScreen entity) {
                 entity.stage.getActors().clear();                                                                      //清除stage的内容
                 entity.stage.addActor(entity.gguanyu);                                                                //将道路选择的内容增加进去
+//                entity.gguanyu.setQuestion(0);
             }
             @Override
             public void update(FollowUpScreen entity) {}
@@ -109,6 +111,14 @@ public class FollowUpScreen extends UGameScreen {
         }
     }
 
+    private Sound s_bigroad = null;                                                                                   //选择大路的声音
+    private Sound s_huarong = null;                                                                                   //选择华容道的声音
+    public Sound getS_bigroad() {return s_bigroad;}
+    public Sound getS_huarong() {return s_huarong;}
+    public void stopAllSound(){s_huarong.stop();s_bigroad.stop();}
+    private long si_bigroad = 0;
+    private long si_huarong = 0;
+
     /**
      * 重设追击界面
      */
@@ -127,6 +137,11 @@ public class FollowUpScreen extends UGameScreen {
         initRoadButton();
         initQuestion();
         initResultImage();
+
+        //初始化选择道路的声音
+        s_bigroad = Gdx.audio.newSound(Gdx.files.internal("followup/sound/s_bigroad.ogg"));
+        s_huarong = Gdx.audio.newSound(Gdx.files.internal("followup/sound/s_huarong.ogg"));
+
         //初始化状态机部分
 //        stateMachine = new DefaultStateMachine<FollowUpScreen>(this,FollowUpScreenState.STATE_NO_ENABLE);
         stateMachine = new DefaultStateMachine<FollowUpScreen>(this,FollowUpScreenState.STATE_NOMAL);
@@ -136,11 +151,11 @@ public class FollowUpScreen extends UGameScreen {
      * 初始化选择道路的按钮
      */
     private void initRoadButton(){
-        t_road1 = new Texture(Gdx.files.internal("followup/road1.jpg"));
-        t_road2 = new Texture(Gdx.files.internal("followup/road2.jpg"));
+        t_bigroad = new Texture(Gdx.files.internal("followup/road1.jpg"));
+        t_huarong = new Texture(Gdx.files.internal("followup/road2.jpg"));
 
-        rbutton1 = new RoadButton(t_road1);
-        rbutton2 = new RoadButton(t_road2);
+        rbutton1 = new RoadButton(t_bigroad);
+        rbutton2 = new RoadButton(t_huarong);
 
         rbutton1.setPosition(.0f, rbutton2.getHeight());
 
@@ -149,12 +164,10 @@ public class FollowUpScreen extends UGameScreen {
             @Override
             public boolean touchDown(InputEvent event, float x, float y, int pointer, int button) {
                 if(((RoadButton)event.getTarget()).isEnable()) {
-
                     if (stateMachine.isInState(FollowUpScreenState.STATE_NOMAL)) {
-                        listener.confirm(FollowUpScreen.this,false);
-//                        PlcCommHelper.getInstance().simpleGet("/plc_send_serial?plccmd=HUARONG");
-//                        stateMachine.changeState(FollowUpScreenState.STATE_QUESTION);
-//                        rbutton1.setB_cover(true);
+                        si_huarong = s_huarong.play();                                                              //播放选择华容道音效
+//                        gguanyu.setQuestion(0);
+                        listener.confirm(FollowUpScreen.this, false);
                     }
                 }
                 return super.touchDown(event, x, y, pointer, button);
@@ -166,10 +179,8 @@ public class FollowUpScreen extends UGameScreen {
             public boolean touchDown(InputEvent event, float x, float y, int pointer, int button) {
                 if (((RoadButton) event.getTarget()).isEnable()) {
                     if (stateMachine.isInState(FollowUpScreenState.STATE_NOMAL)) {
+                        si_bigroad = s_bigroad.play();
                         listener.confirm(FollowUpScreen.this, true);
-//                        stateMachine.changeState(FollowUpScreenState.STATE_END);
-//                        rbutton2.setB_cover(true);
-//                        PlcCommHelper.getInstance().simpleGet("/plc_send_serial?plccmd=BIGROAD");
                     }
                 }
                 return super.touchDown(event, x, y, pointer, button);
@@ -211,7 +222,6 @@ public class FollowUpScreen extends UGameScreen {
         t_failed = new Texture(Gdx.files.internal("followup/defeat.png"));
         img_success = new StampImage(t_success);
         img_failed = new StampImage(t_failed);
-
 
         img_success.setStampCompleteListener(new StampImage.StampComplete() {
             @Override
@@ -261,6 +271,7 @@ public class FollowUpScreen extends UGameScreen {
         //选择华容道
         }else{
             stateMachine.changeState(FollowUpScreenState.STATE_QUESTION);
+            gguanyu.setQuestion(0);
             rbutton1.setB_cover(true);
             PlcCommHelper.getInstance().simpleGet("/plc_send_serial?plccmd=HUARONG");
         }
@@ -295,8 +306,8 @@ public class FollowUpScreen extends UGameScreen {
     @Override
     public void dispose() {
         super.dispose();
-        t_road1.dispose();
-        t_road2.dispose();
+        t_bigroad.dispose();
+        t_huarong.dispose();
         t_guanyu.dispose();
         if(tl_shake!=null) {
             tl_shake.kill();
@@ -370,11 +381,12 @@ class QuestionGroup extends Group implements Disposable {
     private int currQuestionIndex = 0;                                                                              //当前问题的序号
     private Array<Question> questions = new Array<Question>();                                                       //所有问题
     private BitmapFont bf = null;                                                                                     //问题的文字
-    private TextButton tb1,tb2;
+    private TextButton tb1,tb2;                                                                                       //问题12选项
     private Table table;
-    private Label l;
+    private Label l;                                                                                                   //显示的问题
+    private ExtSound s_question,s_answerA,s_answerB;                                                                 //问题和答案的声音
     private QuestionListener listener = null;
-    private boolean enable = true;
+    private boolean enable = true;                                                                                  //问题组是否可用
 
     public QuestionGroup(Texture t){
 //        this.setSize(720,1024);
@@ -385,19 +397,18 @@ class QuestionGroup extends Group implements Disposable {
         bg_guanyu.setColor(c_gy.r, c_gy.g, c_gy.b, .7f);
         this.addActor(bg_guanyu);                                                                                     //增加背景
 
-
-        questions.add(new Question("丞相！前方有关羽率军堵截，我军该如何应对？", 1,
-                new String[]{"A.曹操:自此绝境，只好以死相拼。全军出击！", "B.程昱:关云长素以忠义著称，昔日丞相曾有恩于他，不妨上前哀告，或可脱此危难"}));                                               //增加答案
-        questions.add(new Question("关羽奉军师将令,在此等候丞相多时.", 1,
-                new String[]{"A.孤今日虽遭此大败，乃时运不济。纵然死于此处，实在难以心服。", "B.今日兵败于此，望将军以昔日情谊为重…"}));                                                 //增加答案
-        questions.add(new Question("昔日，丞相却是待我不薄，然而我斩颜良诛文丑已报过丞相之恩，今日岂可以私废公？", 0,
-                new String[]{"A.云长过五关斩将之时，孤并不曾派兵追赶，反而传令与将军放行，大丈夫应以信义为重，将军忍心杀害故交吗？", "B.倘若孤今日丧命于此，东吴岂会容汝等全身而退，以令兄玄德之军力，必为周瑜所图，届时，天下危矣，汉室危矣…"}));                                                 //增加答案
-        questions.add(new Question("", 1, new String[]{"A.曹操缓步率军通过华容道.", "B.趁关羽犹豫，进一步晓之以理动之以情"}));                                                 //增加答案
-
+        questions.add(new Question("丞相！前方有关羽率军堵截，我军该如何应对？", "followup/sound/q0.ogg", 7, 1,
+                new String[]{"A.曹操:自此绝境，只好以死相拼。全军出击！", "B.程昱:关云长素以忠义著称，昔日丞相曾有恩于他，不妨上前哀告，或可脱此危难"},
+                new String[]{"followup/sound/q0a0.ogg", "followup/sound/q0a1.ogg"}, new long[]{19, 24}));                                               //增加答案
+        questions.add(new Question("关羽奉军师将令,在此等候丞相多时.", "followup/sound/q1.ogg", 8, 1,
+                new String[]{"A.孤今日虽遭此大败，乃时运不济。纵然死于此处，实在难以心服。", "B.今日兵败于此，望将军以昔日情谊为重…"},
+                new String[]{"followup/sound/q1a0.ogg", "followup/sound/q1a1.ogg"}, new long[]{23, 9}));                                                 //增加答案
+        questions.add(new Question("昔日，丞相却是待我不薄，然而我斩颜良诛文丑已报过丞相之恩，今日岂可以私废公？", "followup/sound/q2.ogg", 12, 0,
+                new String[]{"A.云长过五关斩将之时，孤并不曾派兵追赶，反而传令与将军放行，大丈夫应以信义为重，将军忍心杀害故交吗？", "B.倘若孤今日丧命于此，东吴岂会容汝等全身而退，以令兄玄德之军力，必为周瑜所图，届时，天下危矣，汉室危矣…"},
+                new String[]{"followup/sound/q2a0.ogg", "followup/sound/q2a1.ogg"}, new long[]{20, 36}));                                                 //增加答案
+        questions.add(new Question("", "", 0, 1, new String[]{"A.曹操缓步率军通过华容道.", "B.趁关羽犹豫，进一步晓之以理动之以情"},
+                new String[]{"followup/sound/q3a0.ogg", "followup/sound/q3a1.ogg"}, new long[]{17,46}));                                                 //增加答案
         makeQuestion();
-        this.removeActor(table);
-        table = setQuestion(questions.get(currQuestionIndex));
-        this.addActor(table);
     }
 
     public void makeQuestion(){
@@ -455,43 +466,71 @@ class QuestionGroup extends Group implements Disposable {
         currQuestionIndex = 0;
         enable = true;
         this.removeActor(table);
-        table = setQuestion(questions.get(0));
         this.addActor(table);
     }
 
     /**
      * 判断答案是否正确
-     * @param correctIndex  正确答案的序号
+     * @param selectIndex  正确答案的序号
      */
-    private void judgeAnswer(int correctIndex){
-        if(questions.get(currQuestionIndex).correctIndex==correctIndex) {
-            if(currQuestionIndex==3){
-                //胜利操作
-                if(listener!=null)
-                    listener.success();
-                return;
+    private void judgeAnswer(final int selectIndex){
+        ExtSound s = questions.get(currQuestionIndex).s_answer.get(selectIndex);
+//        if(s.isPlay())
+//            return;
+        enable = false;
+        s.play(new ExtSound.ExtSoundListener() {
+            @Override
+            public void playend(ExtSound s) {
+                if (questions.get(currQuestionIndex).correctIndex == selectIndex) {
+                    if (currQuestionIndex == 3) {
+                        //胜利操作
+                        if (listener != null)
+                            listener.success();
+                        return;
+                    }
+                    currQuestionIndex++;
+                    setQuestion(currQuestionIndex);
+                    enable = true;
+                } else {
+                    //失败操作
+                    if (listener != null)
+                        listener.failed();
+                }
             }
+        });                                                                                                       //播放当前选择的答案的声音
+    }
 
-            currQuestionIndex++;
-            QuestionGroup.this.removeActor(table);
-            table = QuestionGroup.this.setQuestion(questions.get(currQuestionIndex));
-            QuestionGroup.this.addActor(table);
-        }
-        else{
-            //失败操作
-            if(listener!=null)
-                listener.failed();
-        }
+    /**
+     * 设置题目
+     * @param i 题目编号
+     */
+    public void setQuestion(int i){
+        this.removeActor(table);
+        table = setQuestion(questions.get(i));
+        this.addActor(table);
     }
 
     /**
      * 设置问题
      * @param q     问题对象,从中取出问题与答案的文字
      */
-    private Table setQuestion(Question q) {
+    public Table setQuestion(Question q) {
         l.setText(q.question);
         tb1.setText(q.answer.get(0));
         tb2.setText(q.answer.get(1));
+        tb1.setVisible(false);
+        tb2.setVisible(false);
+
+        s_question = q.s_question;
+        s_answerA = q.s_answer.get(0);
+        s_answerB = q.s_answer.get(1);
+        s_question.play(new ExtSound.ExtSoundListener() {
+            @Override
+            public void playend(ExtSound s) {
+                tb1.setVisible(true);
+                tb2.setVisible(true);
+            }
+        });
 
         Table root = new Table();
         root.setSize(720, 1280);
@@ -531,13 +570,19 @@ class QuestionGroup extends Group implements Disposable {
      */
     class Question{
         public String question = "";                                                                                  //问题
-        public Array<String> answer = new Array<String>();                                                            //答案
-        public int correctIndex = 0;                                                                                //正确答案的序号
-        public Question(String pq,int pci,String[] as){
+        public ExtSound s_question = null;                                                                           //问题语音
+        public Array<String> answer = new Array<String>();                                                                //答案
+        public Array<ExtSound> s_answer = new Array<ExtSound>();                                                     //答案语音
+        public int correctIndex = 0;                                                                                 //正确答案的序号
+        public Question(String pq,String sqpath,long sqlength,int pci,String[] as,String[] aspath,long[] salength){
             question = pq;                                                                                             //问题
+            if(!sqpath.equals(""))
+                s_question = new ExtSound(sqpath,sqlength);                                                           //生成声音对象
             correctIndex = pci;                                                                                       //正确答案序号
-            for(String s:as)
-                answer.add(s);                                                                                         //所有的答案
+            for(int i=0;i<as.length;i++){
+                answer.add(as[i]);                                                                                     //所有的答案
+                s_answer.add(new ExtSound(aspath[i],salength[i]));
+            }
         }
     }
 

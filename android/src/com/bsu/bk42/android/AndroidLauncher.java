@@ -118,41 +118,41 @@ public class AndroidLauncher extends AndroidApplication {
 //			}
 //		}
 //	};
-	private AlertDialog.Builder builder ;
-	/**
-	 * 初始化场景的一些东西
-	 */
-	private void initScreen(){
-		builder = new AlertDialog.Builder(AndroidLauncher.this);
-		MainTabActivity.game.getFollorUpScreen().setFollorUpListener(new FollowUpScreen.FollowUpListener() {
-			@Override
-			public void confirm(FollowUpScreen fus, final boolean isBigRoad) {
-				//接收到确认消息后弹出选择对话框确认是否选择该道路
-				builder.setTitle("选择道路");
-
-				if (isBigRoad)
-					builder.setMessage("确认从乌林撤退么?");
-				else
-					builder.setMessage("确认从华容道撤退么?");
-
-				builder.setPositiveButton("是的", new DialogInterface.OnClickListener() {
-					@Override
-					public void onClick(DialogInterface dialog, int which) {
-						MainTabActivity.game.getFollorUpScreen().selectRoad(isBigRoad);
-						dialog.dismiss();
-					}
-				});
-				builder.setNegativeButton("再想想", new DialogInterface.OnClickListener() {
-					@Override
-					public void onClick(DialogInterface dialog, int which) {
-						dialog.dismiss();
-					}
-				});
-				builder.setCancelable(false);
-				builder.create().show();
-			}
-		});
-	}
+//	private AlertDialog.Builder builder ;
+//	/**
+//	 * 初始化场景的一些东西
+//	 */
+//	private void initScreen(){
+//		builder = new AlertDialog.Builder(AndroidLauncher.this);
+//		MainTabActivity.game.getFollorUpScreen().setFollorUpListener(new FollowUpScreen.FollowUpListener() {
+//			@Override
+//			public void confirm(FollowUpScreen fus, final boolean isBigRoad) {
+//				//接收到确认消息后弹出选择对话框确认是否选择该道路
+//				builder.setTitle("选择道路");
+//
+//				if (isBigRoad)
+//					builder.setMessage("确认从乌林撤退么?");
+//				else
+//					builder.setMessage("确认从华容道撤退么?");
+//
+//				builder.setPositiveButton("是的", new DialogInterface.OnClickListener() {
+//					@Override
+//					public void onClick(DialogInterface dialog, int which) {
+//						MainTabActivity.game.getFollorUpScreen().selectRoad(isBigRoad);
+//						dialog.dismiss();
+//					}
+//				});
+//				builder.setNegativeButton("再想想", new DialogInterface.OnClickListener() {
+//					@Override
+//					public void onClick(DialogInterface dialog, int which) {
+//						dialog.dismiss();
+//					}
+//				});
+//				builder.setCancelable(false);
+//				builder.create().show();
+//			}
+//		});
+//	}
 
 	/**
 	 * 重设游戏
