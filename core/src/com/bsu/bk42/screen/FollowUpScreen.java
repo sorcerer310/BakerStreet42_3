@@ -41,6 +41,7 @@ public class FollowUpScreen extends UGameScreen {
     private Texture t_guanyu = null;                                                                                 //关羽图片纹理资源
 
     private QuestionGroup gguanyu = null;                                                                            //问答题组
+    private FollowUpListener listener = null;
 
     private Texture t_success,t_failed = null;                                                                     //成功\失败的纹理
     private StampImage img_success,img_failed = null;                                                                   //成功失败的图
@@ -127,9 +128,8 @@ public class FollowUpScreen extends UGameScreen {
         initQuestion();
         initResultImage();
         //初始化状态机部分
-        stateMachine = new DefaultStateMachine<FollowUpScreen>(this,FollowUpScreenState.STATE_NO_ENABLE);
-
-
+//        stateMachine = new DefaultStateMachine<FollowUpScreen>(this,FollowUpScreenState.STATE_NO_ENABLE);
+        stateMachine = new DefaultStateMachine<FollowUpScreen>(this,FollowUpScreenState.STATE_NOMAL);
     }
 
     /**
@@ -151,9 +151,10 @@ public class FollowUpScreen extends UGameScreen {
                 if(((RoadButton)event.getTarget()).isEnable()) {
 
                     if (stateMachine.isInState(FollowUpScreenState.STATE_NOMAL)) {
-                        PlcCommHelper.getInstance().simpleGet("/plc_send_serial?plccmd=HUARONG");
-                        stateMachine.changeState(FollowUpScreenState.STATE_QUESTION);
-                        rbutton1.setB_cover(true);
+                        listener.confirm(FollowUpScreen.this,false);
+//                        PlcCommHelper.getInstance().simpleGet("/plc_send_serial?plccmd=HUARONG");
+//                        stateMachine.changeState(FollowUpScreenState.STATE_QUESTION);
+//                        rbutton1.setB_cover(true);
                     }
                 }
                 return super.touchDown(event, x, y, pointer, button);
@@ -165,10 +166,10 @@ public class FollowUpScreen extends UGameScreen {
             public boolean touchDown(InputEvent event, float x, float y, int pointer, int button) {
                 if (((RoadButton) event.getTarget()).isEnable()) {
                     if (stateMachine.isInState(FollowUpScreenState.STATE_NOMAL)) {
-//                        ((RoadButton) (event.getTarget())).setB_cover(true);
-                        stateMachine.changeState(FollowUpScreenState.STATE_END);
-                        rbutton2.setB_cover(true);
-                        PlcCommHelper.getInstance().simpleGet("/plc_send_serial?plccmd=BIGROAD");
+                        listener.confirm(FollowUpScreen.this, true);
+//                        stateMachine.changeState(FollowUpScreenState.STATE_END);
+//                        rbutton2.setB_cover(true);
+//                        PlcCommHelper.getInstance().simpleGet("/plc_send_serial?plccmd=BIGROAD");
                     }
                 }
                 return super.touchDown(event, x, y, pointer, button);
@@ -247,6 +248,24 @@ public class FollowUpScreen extends UGameScreen {
 
     }
 
+    /**
+     * 选择道路操作.
+     * @param b 为true时选择大路,为false时选择华容道
+     */
+    public void selectRoad(boolean b){
+        //选择大路操作
+        if(b){
+            stateMachine.changeState(FollowUpScreenState.STATE_END);
+            rbutton2.setB_cover(true);
+            PlcCommHelper.getInstance().simpleGet("/plc_send_serial?plccmd=BIGROAD");
+        //选择华容道
+        }else{
+            stateMachine.changeState(FollowUpScreenState.STATE_QUESTION);
+            rbutton1.setB_cover(true);
+            PlcCommHelper.getInstance().simpleGet("/plc_send_serial?plccmd=HUARONG");
+        }
+    }
+
     private Timeline tl_shake;
     /**
      * 摇晃屏幕
@@ -283,6 +302,21 @@ public class FollowUpScreen extends UGameScreen {
             tl_shake.kill();
             tl_shake.free();
         }
+    }
+
+    /**
+     * 追击界面的监听器
+     */
+    public static interface FollowUpListener{
+        void confirm(FollowUpScreen fus,boolean isBigRoad);                                                           //用来调用确认框
+    }
+
+    /**
+     * 设置追击界面的监听器
+     * @param listener
+     */
+    public void setFollorUpListener(FollowUpListener listener) {
+        this.listener = listener;
     }
 }
 
