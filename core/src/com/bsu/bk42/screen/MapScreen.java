@@ -52,22 +52,22 @@ public class MapScreen extends UGameScreen {
         initScrollPane();
 
         plcCommand(0);
-        plcCommand(1);
-        plcCommand(2);
-        plcCommand(3);
-        plcCommand(4);
-        plcCommand(5);
-        plcCommand(6);
-        plcCommand(7);
-        plcCommand(8);
-        plcCommand(9);
-        plcCommand(10);
-        plcCommand(11);
-        plcCommand(12);
-        plcCommand(13);
-        plcCommand(14);
+//        plcCommand(1);
+//        plcCommand(2);
+//        plcCommand(3);
+//        plcCommand(4);
+//        plcCommand(5);
+//        plcCommand(6);
+//        plcCommand(7);
+//        plcCommand(8);
+//        plcCommand(9);
+//        plcCommand(10);
+//        plcCommand(11);
+//        plcCommand(12);
+//        plcCommand(13);
+//        plcCommand(14);
 //        plcCommand(15);
-        plcCommand(16);
+//        plcCommand(16);
     }
 
     /**
