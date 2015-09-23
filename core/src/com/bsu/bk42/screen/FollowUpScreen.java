@@ -143,8 +143,8 @@ public class FollowUpScreen extends UGameScreen {
         s_huarong = Gdx.audio.newSound(Gdx.files.internal("followup/sound/s_huarong.ogg"));
 
         //初始化状态机部分
-//        stateMachine = new DefaultStateMachine<FollowUpScreen>(this,FollowUpScreenState.STATE_NO_ENABLE);
-        stateMachine = new DefaultStateMachine<FollowUpScreen>(this,FollowUpScreenState.STATE_NOMAL);
+        stateMachine = new DefaultStateMachine<FollowUpScreen>(this,FollowUpScreenState.STATE_NO_ENABLE);
+//        stateMachine = new DefaultStateMachine<FollowUpScreen>(this,FollowUpScreenState.STATE_NOMAL);
     }
 
     /**
