@@ -52,23 +52,22 @@ public class MapScreen extends UGameScreen {
         initScrollPane();
 
         plcCommand(0);
-//        plcCommand(1);
-//        plcCommand(2);
-//        plcCommand(3);
-//        plcCommand(4);
-//        plcCommand(5);
-//        plcCommand(6);
-
-//        plcCommand(7);
-//        plcCommand(8);
-//        plcCommand(9);
-//        plcCommand(10);
-//        plcCommand(11);
-//        plcCommand(12);
-//        plcCommand(13);
-//        plcCommand(14);
+        plcCommand(1);
+        plcCommand(2);
+        plcCommand(3);
+        plcCommand(4);
+        plcCommand(5);
+        plcCommand(6);
+        plcCommand(7);
+        plcCommand(8);
+        plcCommand(9);
+        plcCommand(10);
+        plcCommand(11);
+        plcCommand(12);
+        plcCommand(13);
+        plcCommand(14);
 //        plcCommand(15);
-//        plcCommand(16);
+        plcCommand(16);
     }
 
     /**
@@ -126,11 +125,11 @@ public class MapScreen extends UGameScreen {
                 {620, 883}, {530, 550},                                         //乌龟,插旗
                 {480, 120}, {480, 880}, {140, 350}, {140, 889}, {480, 260},     //军令台,4个脚踏
                 {330, 1335},{330, 974},                                         //通道两小门
-                {115, 1652}, {368, 1652},                                       //两侧墙壁铁索连环
-                {568, 2036}, {661, 1715}, {683, 1475},                          //船舱门,草船借箭,擂鼓
-                {220,2120},{145, 2120},                                         //宝剑咒语箱子,借东风
-                {736, 2121},                                                    //追击小门
-                {920, 2121}, {825, 1914}                                        //大路小门,华容道小门
+                {130, 1700}, {440, 1700},                                       //两侧墙壁铁索连环
+                {620, 2040}, {700, 1715}, {760, 1430},                          //船舱门,草船借箭,擂鼓
+                {330,2160},{190, 2120},                                         //宝剑咒语箱子,借东风
+                {780, 2130},                                                    //追击小门
+                {980, 2110}, {880, 1780}                                        //大路小门,华容道小门
         });
         for(Mark m:marks)
             mapgroup.addActor(m);
@@ -231,7 +230,7 @@ public class MapScreen extends UGameScreen {
                         2+7*cloudsWidth,1+7*cloudsWidth,0+7*cloudsWidth,
                         2+8*cloudsWidth,1+8*cloudsWidth,0+8*cloudsWidth,
                         2+9*cloudsWidth,1+9*cloudsWidth,0+9*cloudsWidth,
-                        4+10*cloudsWidth,3+10*cloudsWidth,2+10*cloudsWidth,1+10*cloudsWidth,0+10*cloudsWidth
+                        3+10*cloudsWidth,2+10*cloudsWidth,1+10*cloudsWidth,0+10*cloudsWidth
                 };
                 break;
             //草船借箭
@@ -247,28 +246,33 @@ public class MapScreen extends UGameScreen {
             //华容道前小路
             case 6:
                 di = new int[]{
-                        5+10*cloudsWidth,6+10*cloudsWidth
+                        4+10*cloudsWidth,5+10*cloudsWidth
                 };
                 break;
             //大路
             case 7:
                 di = new int[]{
-                        7+6*cloudsWidth,6+6*cloudsWidth,
-                        7+7*cloudsWidth,6+7*cloudsWidth,
+                        6+6*cloudsWidth,
+                        6+7*cloudsWidth,
                         7+8*cloudsWidth,6+8*cloudsWidth,
                         7+9*cloudsWidth,6+9*cloudsWidth,
                         7+10*cloudsWidth,6+10*cloudsWidth,
-                        5+10*cloudsWidth
+                        5+6*cloudsWidth
                 };
+                //移动其他几朵云彩调整位置
+                int[] mi = new int[]{
+                        5+7*cloudsWidth,5+8*cloudsWidth,5+9*cloudsWidth,
+                };
+                for(int i=0;i<mi.length;i++)
+                    clouds.get(mi[i]).moveLeft(100);
                 break;
             //华容道
             case 8:
                 di = new int[]{
-                        5+6*cloudsWidth,6+6*cloudsWidth,
-                        5+7*cloudsWidth,6+7*cloudsWidth,
-                        5+8*cloudsWidth,6+8*cloudsWidth,
-                        5+9*cloudsWidth,6+9*cloudsWidth,
-                        5+10*cloudsWidth
+                        5+6*cloudsWidth,
+                        5+7*cloudsWidth,
+                        5+8*cloudsWidth,
+                        5+9*cloudsWidth,
                 };
                 break;
         }
@@ -369,10 +373,10 @@ public class MapScreen extends UGameScreen {
                 moveMap(.0f,1.0f);
                 break;
             case 6:             //触发通道人体感应
-                break;
-            case 7:             //第4个脚踏踩亮
                 //第4个脚踏亮
                 appearMark(7);
+                break;
+            case 7:             //第4个脚踏踩亮
                 //铁锁连环云彩消失
                 dispareClouds(4);
                 //移动地图焦点
@@ -415,7 +419,7 @@ public class MapScreen extends UGameScreen {
                 break;
             case 14:            //手机点火完成,华容道前开
                 //华容道前小门开
-                appearMark(18);
+                appearMark(17);
                 //华容道前云彩消失
                 dispareClouds(6);
                 //移动地图焦点
@@ -497,6 +501,16 @@ class Cloud extends Image{
                 }))
                 .start(tm);
     }
+
+    /**
+     * 向左移动一定距离
+     * @param l 移动的距离
+     */
+    public void moveLeft(float l){
+        Tween.to(this,ActorAccessor.POS_XY,0.5f).target(this.getX()-l,this.getY())
+                .start(tm);
+    }
+
 
     @Override
     public void act(float delta) {
