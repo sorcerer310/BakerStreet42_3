@@ -1,14 +1,11 @@
 package com.bsu.bk42.android;
 
-import android.app.Activity;
-import android.app.ActivityManager;
-import android.app.Service;
-import android.app.TabActivity;
+import android.app.*;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
-import android.os.Bundle;
-import android.os.Vibrator;
+import android.os.*;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.widget.RadioButton;
@@ -16,6 +13,7 @@ import android.widget.RadioGroup;
 import android.widget.TabHost;
 import com.badlogic.gdx.Gdx;
 import com.bsu.bk42.BakerStreet42;
+import com.bsu.bk42.screen.FollowUpScreen;
 import org.androidpn.client.Constants;
 import org.androidpn.client.ServiceManager;
 
@@ -35,8 +33,6 @@ public class MainTabActivity extends TabActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.main_tab);
-
-
         init();
         initservice();
     }
@@ -85,7 +81,7 @@ public class MainTabActivity extends TabActivity {
 
         }
     }
-
+    private AlertDialog confirmDialog;
     /**
      * 初始化Tab界面
      */
@@ -119,13 +115,53 @@ public class MainTabActivity extends TabActivity {
                     case R.id.main_tab_followup:
                         m_tabHost.setCurrentTabByTag(Constant.mTextviewArray[3]);
                         MainTabActivity.game.setScreen(BakerStreet42.FOLLOWUP);             //设置当前界面为追击界面
+
+                        final AlertDialog.Builder builder = new AlertDialog.Builder(MainTabActivity.this);
+                        MainTabActivity.game.getFollorUpScreen().setFollorUpListener(new FollowUpScreen.FollowUpListener() {
+                            @Override
+                            public void confirm(FollowUpScreen fus, final boolean isBigRoad) {
+                                //接收到确认消息后弹出选择对话框确认是否选择该道路
+                                builder.setTitle("选择道路");
+
+                                if (isBigRoad)
+                                    builder.setMessage("确定从\"乌林\"撤退么?");
+                                else
+                                    builder.setMessage("确定从\"华容道\"撤退么?");
+
+                                builder.setPositiveButton("是的", new DialogInterface.OnClickListener() {
+                                    @Override
+                                    public void onClick(DialogInterface dialog, int which) {
+                                        MainTabActivity.game.getFollorUpScreen().selectRoad(isBigRoad);
+                                        dialog.dismiss();
+                                        MainTabActivity.game.getFollorUpScreen().stopAllSound();                        //确认界面消失停止所有声音
+
+                                    }
+                                });
+                                builder.setNegativeButton("再想想", new DialogInterface.OnClickListener() {
+                                    @Override
+                                    public void onClick(DialogInterface dialog, int which) {
+                                        dialog.dismiss();
+                                        MainTabActivity.game.getFollorUpScreen().stopAllSound();                        //确认界面消失停止所有声音
+                                    }
+                                });
+                                builder.setCancelable(false);
+                                //需要在子线程中处理窗口的创建与显示
+                                new Thread(){
+                                    public void run() {
+                                        Looper.prepare();
+                                        //显示选择窗口
+                                        confirmDialog = builder.create();
+                                        confirmDialog.show();
+                                        Looper.loop();
+                                    };
+                                }.start();
+                            }
+                        });
                         break;
                 }
             }
         });
         ((RadioButton) m_radioGroup.getChildAt(0)).toggle();
-
-
     }
 
     /**
