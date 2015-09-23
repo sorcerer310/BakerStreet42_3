@@ -51,7 +51,7 @@ public class MainTabActivity extends TabActivity {
     protected void onNewIntent(Intent intent) {
         super.onNewIntent(intent);
         String urivalue = intent.getStringExtra(Constants.NOTIFICATION_URI);
-        if(urivalue==null || !urivalue.contains(":"))
+        if(urivalue==null || urivalue.equals(""))
             return;
 
         vibrate(this,500);                                                                                              //震动500ms
