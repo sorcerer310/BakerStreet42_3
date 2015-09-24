@@ -397,17 +397,17 @@ class QuestionGroup extends Group implements Disposable {
         bg_guanyu.setColor(c_gy.r, c_gy.g, c_gy.b, .7f);
         this.addActor(bg_guanyu);                                                                                     //增加背景
 
-        questions.add(new Question("丞相！前方有关羽率军拦截，我军该如何应对?", "followup/sound/q0.ogg", 7, 1,
+        questions.add(new Question("丞相！前方有关羽率军拦截，我军该如何应对?", "followup/sound/q0.ogg", 6, 1,
                 new String[]{"A.曹操:自此绝境，也只好以死相拼。全军出击！", "B.程昱:丞相,关云长素以忠义著称，昔日丞相曾有恩于他，不妨上前哀告，或可脱此危难呀."},
-                new String[]{"followup/sound/q0a0.ogg", "followup/sound/q0a1.ogg"}, new long[]{19, 24}));                                               //增加答案
-        questions.add(new Question("关羽奉军师将令,在此等候丞相多时.", "followup/sound/q1.ogg", 8, 1,
+                new String[]{"followup/sound/q0a0.ogg", "followup/sound/q0a1.ogg"}, new long[]{13, 15}));                                               //增加答案
+        questions.add(new Question("关羽奉军师将令,在此等候丞相多时.", "followup/sound/q1.ogg", 5, 1,
                 new String[]{"A.孤今日虽遭此大败，乃时运不济。纵然死于此处，实在难以心服。", "B.今日兵败于此，望将军以昔日情谊为重…"},
-                new String[]{"followup/sound/q1a0.ogg", "followup/sound/q1a1.ogg"}, new long[]{23, 9}));                                                 //增加答案
-        questions.add(new Question("昔日，丞相却是待我不薄，然而我斩颜良诛文丑已报过丞相之恩，今日岂可以私废公?", "followup/sound/q2.ogg", 12, 0,
+                new String[]{"followup/sound/q1a0.ogg", "followup/sound/q1a1.ogg"}, new long[]{22, 7}));                                                 //增加答案
+        questions.add(new Question("昔日，丞相却是待我不薄，然而我斩颜良诛文丑已报过丞相之恩，今日岂可以私废公?", "followup/sound/q2.ogg", 10, 0,
                 new String[]{"A.昔日云长过五关斩将之时，孤并不曾派兵追赶，反而传令与将军放行，大丈夫应以信义为重，将军忍心杀害故交吗?", "B.曹操:倘若孤今日丧命于此，东吴岂会容汝等全身而退，以令兄玄德之军力，必为周瑜所图。届时，天下危矣，汉室危矣…"},
-                new String[]{"followup/sound/q2a0.ogg", "followup/sound/q2a1.ogg"}, new long[]{20, 36}));                                                 //增加答案
+                new String[]{"followup/sound/q2a0.ogg", "followup/sound/q2a1.ogg"}, new long[]{17, 33}));                                                 //增加答案
         questions.add(new Question("", "", 0, 1, new String[]{"A.曹操缓步率军通过华容道.", "B.趁关羽犹豫，进一步晓之以理动之以情"},
-                new String[]{"followup/sound/q3a0.ogg", "followup/sound/q3a1.ogg"}, new long[]{17, 46}));                                                 //增加答案
+                new String[]{"followup/sound/q3a0.ogg", "followup/sound/q3a1.ogg"}, new long[]{7, 40}));                                                 //增加答案
         makeQuestion();
     }
 
