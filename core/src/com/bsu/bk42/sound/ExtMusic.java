@@ -2,20 +2,19 @@ package com.bsu.bk42.sound;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.audio.Music;
-import com.badlogic.gdx.audio.Sound;
 import com.badlogic.gdx.utils.Timer;
 
 /**
  * 扩展的Sound类
  * Created by fc on 2015/9/22.
  */
-public class ExtSound {
+public class ExtMusic {
 //    private Sound s;                                                                                                   //声音对象
     private Music s;
     private long slength;                                                                                            //声音长度
     private ExtSoundListener listener;
     private boolean isPlay = false;                                                                                 //是否正在播放
-    public ExtSound(String spath,long time){
+    public ExtMusic(String spath, long time){
 //        s = Gdx.audio.newSound(Gdx.files.internal(spath));
         s = Gdx.audio.newMusic(Gdx.files.internal(spath));
         slength = time;
@@ -33,7 +32,8 @@ public class ExtSound {
             @Override
             public void run() {
                 isPlay = false;
-                listener.playend(ExtSound.this);
+                if(listener!=null)
+                    listener.playend(ExtMusic.this);
             }
         }, slength);
     }
@@ -67,6 +67,6 @@ public class ExtSound {
      * 扩展声音类的监听器
      */
     public static interface ExtSoundListener{
-        void playend(ExtSound s);
+        void playend(ExtMusic s);
     }
 }

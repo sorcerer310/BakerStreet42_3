@@ -24,7 +24,7 @@ import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.Disposable;
 import com.badlogic.gdx.utils.viewport.StretchViewport;
 import com.bsu.bk42.PlcCommHelper;
-import com.bsu.bk42.sound.ExtSound;
+import com.bsu.bk42.sound.ExtMusic;
 import com.ugame.gdx.tools.UGameScreen;
 import com.ugame.gdx.tools.WidgetFactory;
 import com.ugame.gdx.tween.accessor.ActorAccessor;
@@ -384,7 +384,7 @@ class QuestionGroup extends Group implements Disposable {
     private TextButton tb1,tb2;                                                                                       //问题12选项
     private Table table;
     private Label l;                                                                                                   //显示的问题
-    private ExtSound s_question,s_answerA,s_answerB;                                                                 //问题和答案的声音
+    private ExtMusic s_question,s_answerA,s_answerB;                                                                 //问题和答案的声音
     private QuestionListener listener = null;
     private boolean enable = true;                                                                                  //问题组是否可用
 
@@ -474,13 +474,13 @@ class QuestionGroup extends Group implements Disposable {
      * @param selectIndex  正确答案的序号
      */
     private void judgeAnswer(final int selectIndex){
-        ExtSound s = questions.get(currQuestionIndex).s_answer.get(selectIndex);
+        ExtMusic s = questions.get(currQuestionIndex).s_answer.get(selectIndex);
 //        if(s.isPlay())
 //            return;
         enable = false;
-        s.play(new ExtSound.ExtSoundListener() {
+        s.play(new ExtMusic.ExtSoundListener() {
             @Override
-            public void playend(ExtSound s) {
+            public void playend(ExtMusic s) {
                 if (questions.get(currQuestionIndex).correctIndex == selectIndex) {
                     if (currQuestionIndex == 3) {
                         //胜利操作
@@ -528,9 +528,9 @@ class QuestionGroup extends Group implements Disposable {
             tb1.setVisible(true);
             tb2.setVisible(true);
         }else{
-            s_question.play(new ExtSound.ExtSoundListener() {
+            s_question.play(new ExtMusic.ExtSoundListener() {
                 @Override
-                public void playend(ExtSound s) {
+                public void playend(ExtMusic s) {
                     tb1.setVisible(true);
                     tb2.setVisible(true);
                 }
@@ -575,18 +575,18 @@ class QuestionGroup extends Group implements Disposable {
      */
     class Question{
         public String question = "";                                                                                  //问题
-        public ExtSound s_question = null;                                                                           //问题语音
+        public ExtMusic s_question = null;                                                                           //问题语音
         public Array<String> answer = new Array<String>();                                                                //答案
-        public Array<ExtSound> s_answer = new Array<ExtSound>();                                                     //答案语音
+        public Array<ExtMusic> s_answer = new Array<ExtMusic>();                                                     //答案语音
         public int correctIndex = 0;                                                                                 //正确答案的序号
         public Question(String pq,String sqpath,long sqlength,int pci,String[] as,String[] aspath,long[] salength){
             question = pq;                                                                                             //问题
             if(!sqpath.equals(""))
-                s_question = new ExtSound(sqpath,sqlength);                                                           //生成声音对象
+                s_question = new ExtMusic(sqpath,sqlength);                                                           //生成声音对象
             correctIndex = pci;                                                                                       //正确答案序号
             for(int i=0;i<as.length;i++){
                 answer.add(as[i]);                                                                                     //所有的答案
-                s_answer.add(new ExtSound(aspath[i],salength[i]));
+                s_answer.add(new ExtMusic(aspath[i],salength[i]));
             }
         }
     }

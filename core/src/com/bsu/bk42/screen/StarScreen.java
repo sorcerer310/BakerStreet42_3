@@ -2,6 +2,7 @@ package com.bsu.bk42.screen;
 
 import aurelienribon.tweenengine.*;
 import com.badlogic.gdx.Gdx;
+import com.badlogic.gdx.audio.Sound;
 import com.badlogic.gdx.graphics.*;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 import com.badlogic.gdx.math.MathUtils;
@@ -17,8 +18,6 @@ import com.ugame.gdx.tools.ParticlePoolHelper;
 import com.ugame.gdx.tools.UGameScreen;
 import com.ugame.gdx.tween.accessor.ActorAccessor;
 import com.ugame.net.UGameNetInstance;
-
-import java.util.List;
 
 
 /**
@@ -43,8 +42,9 @@ public class StarScreen extends UGameScreen {
     private Array<Vector2> linePoints = new Array<Vector2>();                                                             //要绘制的所有拐点
     private int lineWidth = 5;                                                                                       //绘制的线段宽度
 
-    private ParticlePoolHelper pph_star = new ParticlePoolHelper("particle/star.p","particle");                          //星星粒子
+    private ParticlePoolHelper pph_star = new ParticlePoolHelper("particle/star.p","particle");                 //星星粒子
 
+    private Sound bling = Gdx.audio.newSound(Gdx.files.internal("star/bling.ogg"));
     public StarScreen(){
         screenWidth = 720.0f;                                                                                           //设置游戏界面的宽高
         screenHeight = 1280.0f;
@@ -53,7 +53,6 @@ public class StarScreen extends UGameScreen {
         scaleHeight = Gdx.graphics.getHeight()/screenHeight;
 
         this.setFPS(40.0f);
-
 
         tx_starbackground = new Texture(Gdx.files.internal("star/starbackground.png"));
         tx_star = new Texture(Gdx.files.internal("star/star.png"));
@@ -93,6 +92,7 @@ public class StarScreen extends UGameScreen {
             public boolean touchDown(InputEvent event, float x, float y, int pointer, int button) {
                 if(state == DRAWSTATE.END)
                     return true;
+
                 //当鼠标点在某个星星范围内设置为绘制的第一个点.
                 for (int i = 0; i < currStars.size; i++) {
                     if (currStars.get(i).hit(x - currStars.get(i).getX(), y - currStars.get(i).getY(), true) != null) {
@@ -218,6 +218,9 @@ public class StarScreen extends UGameScreen {
                     return;
                 if (state == DRAWSTATE.NOMAL)
                     state = DRAWSTATE.DRAW;                                                                           //切换到绘制状态
+
+                bling.play();
+
                 movePoint.set(event.getStageX(), event.getStageY());                                                  //设置移动时的坐标
                 //判断当前是否经过了其他星,如果经过了其他的则获得下个绘制拐点
                 for (int i = 0; i < currStars.size; i++) {
