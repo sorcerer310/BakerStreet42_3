@@ -159,6 +159,9 @@ public class MainTabActivity extends TabActivity {
                         });
                         break;
                 }
+
+                //当切换界面时执行一次抬起操作
+                MainTabActivity.game.getStarScreen().getStage().touchUp(0,0,0,0);
             }
         });
         ((RadioButton) m_radioGroup.getChildAt(0)).toggle();
