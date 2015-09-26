@@ -29,7 +29,7 @@ public class BakerStreet42 extends Game {
 			fs = new FireScreen();
 		if(fus==null)
 			fus = new FollowUpScreen();
-		this.setScreen(ss);
+		this.setScreen(ms);
 	}
 
 	/**

@@ -219,7 +219,7 @@ public class StarScreen extends UGameScreen {
                 if (state == DRAWSTATE.NOMAL)
                     state = DRAWSTATE.DRAW;                                                                           //切换到绘制状态
 
-                bling.play();
+//                bling.play();
 
                 movePoint.set(event.getStageX(), event.getStageY());                                                  //设置移动时的坐标
                 //判断当前是否经过了其他星,如果经过了其他的则获得下个绘制拐点

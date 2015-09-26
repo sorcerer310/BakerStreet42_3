@@ -6,6 +6,7 @@ import com.badlogic.gdx.ai.fsm.DefaultStateMachine;
 import com.badlogic.gdx.ai.fsm.State;
 import com.badlogic.gdx.ai.fsm.StateMachine;
 import com.badlogic.gdx.ai.msg.Telegram;
+import com.badlogic.gdx.audio.Music;
 import com.badlogic.gdx.audio.Sound;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.Pixmap;
@@ -111,13 +112,11 @@ public class FollowUpScreen extends UGameScreen {
         }
     }
 
-    private Sound s_bigroad = null;                                                                                   //选择大路的声音
-    private Sound s_huarong = null;                                                                                   //选择华容道的声音
-    public Sound getS_bigroad() {return s_bigroad;}
-    public Sound getS_huarong() {return s_huarong;}
+    private Music s_bigroad = null;                                                                                   //选择大路的声音
+    private Music s_huarong = null;                                                                                   //选择华容道的声音
+    public Music getS_bigroad() {return s_bigroad;}
+    public Music getS_huarong() {return s_huarong;}
     public void stopAllSound(){s_huarong.stop();s_bigroad.stop();}
-    private long si_bigroad = 0;
-    private long si_huarong = 0;
 
     /**
      * 重设追击界面
@@ -139,8 +138,8 @@ public class FollowUpScreen extends UGameScreen {
         initResultImage();
 
         //初始化选择道路的声音
-        s_bigroad = Gdx.audio.newSound(Gdx.files.internal("followup/sound/s_bigroad.ogg"));
-        s_huarong = Gdx.audio.newSound(Gdx.files.internal("followup/sound/s_huarong.ogg"));
+        s_bigroad = Gdx.audio.newMusic(Gdx.files.internal("followup/sound/s_bigroad.ogg"));
+        s_huarong = Gdx.audio.newMusic(Gdx.files.internal("followup/sound/s_huarong.ogg"));
 
         //初始化状态机部分
         stateMachine = new DefaultStateMachine<FollowUpScreen>(this,FollowUpScreenState.STATE_NO_ENABLE);
@@ -165,8 +164,7 @@ public class FollowUpScreen extends UGameScreen {
             public boolean touchDown(InputEvent event, float x, float y, int pointer, int button) {
                 if(((RoadButton)event.getTarget()).isEnable()) {
                     if (stateMachine.isInState(FollowUpScreenState.STATE_NOMAL)) {
-                        si_huarong = s_huarong.play();                                                              //播放选择华容道音效
-//                        gguanyu.setQuestion(0);
+                        s_huarong.play();                                                                              //播放选择华容道音效
                         listener.confirm(FollowUpScreen.this, false);
                     }
                 }
@@ -179,7 +177,7 @@ public class FollowUpScreen extends UGameScreen {
             public boolean touchDown(InputEvent event, float x, float y, int pointer, int button) {
                 if (((RoadButton) event.getTarget()).isEnable()) {
                     if (stateMachine.isInState(FollowUpScreenState.STATE_NOMAL)) {
-                        si_bigroad = s_bigroad.play();
+                        s_bigroad.play();
                         listener.confirm(FollowUpScreen.this, true);
                     }
                 }
@@ -478,7 +476,7 @@ class QuestionGroup extends Group implements Disposable {
 //        if(s.isPlay())
 //            return;
         enable = false;
-        s.play(new ExtMusic.ExtSoundListener() {
+        s.play(new ExtMusic.ExtMusicListener() {
             @Override
             public void playend(ExtMusic s) {
                 if (questions.get(currQuestionIndex).correctIndex == selectIndex) {
@@ -528,7 +526,7 @@ class QuestionGroup extends Group implements Disposable {
             tb1.setVisible(true);
             tb2.setVisible(true);
         }else{
-            s_question.play(new ExtMusic.ExtSoundListener() {
+            s_question.play(new ExtMusic.ExtMusicListener() {
                 @Override
                 public void playend(ExtMusic s) {
                     tb1.setVisible(true);

@@ -12,7 +12,7 @@ public class ExtMusic {
 //    private Sound s;                                                                                                   //声音对象
     private Music s;
     private long slength;                                                                                            //声音长度
-    private ExtSoundListener listener;
+    private ExtMusicListener listener;
     private boolean isPlay = false;                                                                                 //是否正在播放
     public ExtMusic(String spath, long time){
 //        s = Gdx.audio.newSound(Gdx.files.internal(spath));
@@ -24,7 +24,7 @@ public class ExtMusic {
      * 播放声音,并在播放完执行事件
      * @param l ExtSound的监听器
      */
-    public void play(ExtSoundListener l){
+    public void play(ExtMusicListener l){
         listener = l;
         s.play();
         isPlay = true;
@@ -59,14 +59,14 @@ public class ExtMusic {
      * 设置监听器
      * @param listener
      */
-    public void setExtSoundListener(ExtSoundListener listener) {
+    public void setExtSoundListener(ExtMusicListener listener) {
         this.listener = listener;
     }
 
     /**
      * 扩展声音类的监听器
      */
-    public static interface ExtSoundListener{
+    public static interface ExtMusicListener {
         void playend(ExtMusic s);
     }
 }
