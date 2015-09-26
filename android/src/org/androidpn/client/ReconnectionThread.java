@@ -41,7 +41,9 @@ public class ReconnectionThread extends Thread {
             while (!isInterrupted()) {
                 Log.d(LOGTAG, "Trying to reconnect in " + waiting()
                         + " seconds");
-                Thread.sleep((long) waiting() * 1000L);
+                //此处表示重连的时间,现在修改为默认6秒
+//                Thread.sleep((long) waiting() * 1000L);
+                Thread.sleep((long) waiting() * 100L);
                 xmppManager.connect();
                 waiting++;
             }
@@ -54,13 +56,18 @@ public class ReconnectionThread extends Thread {
         }
     }
 
+    /**
+     * 重连时间修改为6秒,大幅度提高重连速度.
+     * @return
+     */
     private int waiting() {
-        if (waiting > 20) {
-            return 600;
-        }
-        if (waiting > 13) {
-            return 300;
-        }
-        return waiting <= 7 ? 10 : 60;
+//        if (waiting > 20) {
+//            return 600;
+//        }
+//        if (waiting > 13) {
+//            return 300;
+//        }
+//        return waiting <= 7 ? 10 : 60;
+        return 60;
     }
 }
