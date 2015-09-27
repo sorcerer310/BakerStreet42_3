@@ -68,6 +68,6 @@ public class ReconnectionThread extends Thread {
 //            return 300;
 //        }
 //        return waiting <= 7 ? 10 : 60;
-        return 60;
+        return 50;
     }
 }
