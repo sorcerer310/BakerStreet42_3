@@ -6,6 +6,7 @@ import android.os.Bundle;
 
 import android.os.Handler;
 import android.os.Message;
+import android.os.StrictMode;
 import android.view.*;
 import android.widget.EditText;
 import android.widget.Toast;
@@ -20,6 +21,13 @@ public class AndroidLauncher extends AndroidApplication {
 	@Override
 	protected void onCreate (Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
+
+		//用来处理android.os.NetworkOnMainThreadException异常
+		if (android.os.Build.VERSION.SDK_INT > 9) {
+			StrictMode.ThreadPolicy policy = new StrictMode.ThreadPolicy.Builder().permitAll().build();
+			StrictMode.setThreadPolicy(policy);
+		}
+
 		AndroidApplicationConfiguration config = new AndroidApplicationConfiguration();
 //		if(MainTabActivity.game==null) {
 			MainTabActivity.game = new BakerStreet42();
@@ -85,14 +93,15 @@ public class AndroidLauncher extends AndroidApplication {
 						if(et.getText().toString().equals(PREFERENCES_CLEAR_PASSWORD)){
 //							Toast.makeText(AndroidLauncher.this, "重置游戏成功", Toast.LENGTH_SHORT).show();
 							//密码正确先重置服务器数据
-//							try {
-//								//向服务器发送命令重置换服务器各项数据
-//								byte[] bytes = Utils.sendPostRequestByForm(PropertiesInstance.getInstance().properties.getProperty("plcgamecenterreset"), "");
-//								String retstr = new String(bytes);
-//								Toast.makeText(AndroidLauncher.this, "重置服务器状态成功:"+retstr, Toast.LENGTH_SHORT).show();
-//							} catch (Exception e) {
-//								Toast.makeText(AndroidLauncher.this, "重置服务器状态失败:"+e.toString(), Toast.LENGTH_SHORT).show();
-//							}
+							try {
+								//向服务器发送命令重置换服务器各项数据
+
+								byte[] bytes = Utils.sendPostRequestByForm("http://192.168.1.112:8080/pgc2/plc_init_serial", "");
+								String retstr = new String(bytes);
+								Toast.makeText(AndroidLauncher.this, "重置服务器状态成功:"+retstr, Toast.LENGTH_SHORT).show();
+							} catch (Exception e) {
+								Toast.makeText(AndroidLauncher.this, "重置服务器状态失败:"+e.toString(), Toast.LENGTH_SHORT).show();
+							}
 							//密码正确则清除数据
 							//重置客户端数据
 							resetGame();
@@ -162,8 +171,7 @@ public class AndroidLauncher extends AndroidApplication {
 		MainTabActivity.game.getStarScreen().resetStars();
 		MainTabActivity.game.getFireScreen().resetFireScreen();
 		MainTabActivity.game.getFollorUpScreen().resetFollowUpScreen();
-		MainTabActivity.game.resetServer();
-//		handler.sendEmptyMessage(0);
+//		MainTabActivity.game.resetServer();
 	}
 
 

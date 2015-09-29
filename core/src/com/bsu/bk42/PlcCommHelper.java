@@ -12,6 +12,7 @@ import com.badlogic.gdx.utils.PropertiesUtils;
  */
 public class PlcCommHelper {
     private int senddelay = 100;
+    private ResponseListener listener = null;
     private static PlcCommHelper instance = null;
     public static PlcCommHelper getInstance(){
         if(instance ==null)
@@ -36,7 +37,10 @@ public class PlcCommHelper {
         request.setUrl(netcfg.get("urlpath")+path);
         Gdx.net.sendHttpRequest(request, new Net.HttpResponseListener() {
             @Override
-            public void handleHttpResponse(Net.HttpResponse httpResponse) {}
+            public void handleHttpResponse(Net.HttpResponse httpResponse) {
+                if(listener!=null)
+                    listener.getResponse(httpResponse.getResultAsString());
+            }
             @Override
             public void failed(Throwable t) {}
             @Override
@@ -76,5 +80,20 @@ public class PlcCommHelper {
 //            System.out.println("time:" + (System.currentTimeMillis() - start));
         }
 
+    }
+
+    /**
+     * 返回数据监听器
+     * @return
+     */
+    public void setListener(ResponseListener rl) {
+        rl = listener;
+    }
+
+    /**
+     * 返回消息监听器
+     */
+    static interface ResponseListener{
+        void getResponse(String string);
     }
 }

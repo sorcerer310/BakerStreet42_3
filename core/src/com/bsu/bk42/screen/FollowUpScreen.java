@@ -404,7 +404,7 @@ class QuestionGroup extends Group implements Disposable {
         questions.add(new Question("昔日，丞相却是待我不薄，然而我斩颜良诛文丑已报过丞相之恩，今日岂可以私废公?", "followup/sound/q2.ogg", 10, 0,
                 new String[]{"A.昔日云长过五关斩将之时，孤并不曾派兵追赶，反而传令与将军放行，大丈夫应以信义为重，将军忍心杀害故交吗?", "B.曹操:倘若孤今日丧命于此，东吴岂会容汝等全身而退，以令兄玄德之军力，必为周瑜所图。届时，天下危矣，汉室危矣…"},
                 new String[]{"followup/sound/q2a0.ogg", "followup/sound/q2a1.ogg"}, new long[]{17, 33}));                                                 //增加答案
-        questions.add(new Question("", "", 0, 1, new String[]{"A.曹操缓步率军通过华容道.", "B.趁关羽犹豫，进一步晓之以理动之以情"},
+        questions.add(new Question("(关羽沉吟不语......)", "", 0, 1, new String[]{"A.曹操缓步率军通过华容道.", "B.趁关羽犹豫，进一步晓之以理动之以情"},
                 new String[]{"followup/sound/q3a0.ogg", "followup/sound/q3a1.ogg"}, new long[]{7, 40}));                                                 //增加答案
         makeQuestion();
     }
@@ -464,7 +464,7 @@ class QuestionGroup extends Group implements Disposable {
         currQuestionIndex = 0;
         enable = true;
         this.removeActor(table);
-        this.addActor(table);
+//        this.addActor(table);
     }
 
     /**
@@ -522,7 +522,8 @@ class QuestionGroup extends Group implements Disposable {
         s_question = q.s_question;
         s_answerA = q.s_answer.get(0);
         s_answerB = q.s_answer.get(1);
-        if(q.question.equals("")) {
+//        if(q.s_question.equals("")) {
+        if(q.s_question==null) {
             tb1.setVisible(true);
             tb2.setVisible(true);
         }else{

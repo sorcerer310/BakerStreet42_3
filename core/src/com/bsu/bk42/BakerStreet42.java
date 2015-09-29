@@ -87,6 +87,13 @@ public class BakerStreet42 extends Game {
 	public FollowUpScreen getFollorUpScreen() {return fus;}
 	//重置服务器状态
 	public void resetServer(){
-		PlcCommHelper.getInstance().simpleGet("/plc_init_serial");
+		PlcCommHelper pch = PlcCommHelper.getInstance();
+		pch.simpleGet("/plc_init_serial");
+		pch.setListener(new PlcCommHelper.ResponseListener() {
+			@Override
+			public void getResponse(String string) {
+				System.out.println(string);
+			}
+		});
 	}
 }

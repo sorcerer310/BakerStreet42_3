@@ -41,7 +41,7 @@ public class ReconnectionThread extends Thread {
             while (!isInterrupted()) {
                 Log.d(LOGTAG, "Trying to reconnect in " + waiting()
                         + " seconds");
-                //´Ë´¦±íÊ¾ÖØÁ¬µÄÊ±¼ä,ÏÖÔÚĞŞ¸ÄÎªÄ¬ÈÏ6Ãë
+                //æ­¤å¤„è¡¨ç¤ºé‡è¿çš„æ—¶é—´,ç°åœ¨ä¿®æ”¹ä¸ºé»˜è®¤6ç§’
 //                Thread.sleep((long) waiting() * 1000L);
                 Thread.sleep((long) waiting() * 100L);
                 xmppManager.connect();
@@ -57,7 +57,7 @@ public class ReconnectionThread extends Thread {
     }
 
     /**
-     * ÖØÁ¬Ê±¼äĞŞ¸ÄÎª6Ãë,´ó·ù¶ÈÌá¸ßÖØÁ¬ËÙ¶È.
+     * é‡è¿æ—¶é—´ä¿®æ”¹ä¸º6ç§’,å¤§å¹…åº¦æé«˜é‡è¿é€Ÿåº¦.
      * @return
      */
     private int waiting() {
